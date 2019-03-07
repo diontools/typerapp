@@ -1,14 +1,14 @@
-import { h, Effect, Subscription, PartialView, PartialAction } from 'typerapp'
+import { h, Effect, Subscription, Action, View } from 'typerapp'
 import { State } from './states'
 import { Delay } from './effects';
 
-const Add: PartialAction<State, 'part', { amount: number }> = (state, params) => ({
+const Add: Action<State, { amount: number }> = (state, params) => ({
     ...state,
-    p: state.p + params.amount,
+    part: { p: state.part.p + params.amount },
 })
 
-export const view: PartialView<State, 'part'> = (root, state, dispatch) => (
+export const view: View<State> = (state, dispatch) => (
     <div>
-        {state.p} <button onClick={ev => dispatch(root, Add, { amount: 1 })}>add</button>
+        {state.part.p} <button onClick={ev => dispatch(Add, { amount: 1 })}>add</button>
     </div>
 )

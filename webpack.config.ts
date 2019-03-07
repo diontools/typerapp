@@ -7,6 +7,7 @@ const distDir = path.resolve(__dirname, 'dist')
 
 const config: webpack.Configuration = {
   entry: './sample/index.tsx',
+  devtool: 'source-map',
   output: {
     path: distDir,
     filename: 'bundle.js'

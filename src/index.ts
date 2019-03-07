@@ -530,7 +530,7 @@ var refresh = function (sub: any, oldSub: any, dispatch: any): any {
             : oldSub
 }
 
-export type ActionResult<S> = S | [S, EffectObjectBase[]?]
+export type ActionResult<S> = S | [S, ...EffectObjectBase[]]
 export type Action<S, P = undefined> = (state: S, params: P) => ActionResult<S>
 
 export type EffectRunner<RunnerProps, ReturnProps> = <S, P>(
@@ -609,35 +609,6 @@ export type Dispatch<S> = {
 
 export type View<S> = (state: S, dispatch: Dispatch<S>) => VNode
 
-export type PartialDispatch<S, N extends keyof S> = {
-    <P>(root: S, action: PartialAction<S, N, P>, params: P): void
-    (root: S, action: PartialAction<S, N, undefined>): void
-}
-export type PartialView<S, N extends keyof S> = (root: S, state: S[N], dispatch: PartialDispatch<S, N>) => VNode
-export type PartialAction<S, N extends keyof S, P> = (state: S[N], params: P) => ActionResult<S[N]>
-
-function mergeResult<S, N extends keyof S>(root: S, name: N, result: ActionResult<S[N]>): ActionResult<S> {
-    if (isArray(result)) {
-        return [mergeState(root, name, result[0]), result[1]]
-    } else {
-        return mergeState(root, name, result)
-    }
-}
-
-function mergeState<S, N extends keyof S>(root: S, name: N, result: S[N]): S {
-    return {
-        ...root,
-        [name]: result,
-    };
-}
-
-export function createPartialDispatch<S, N extends keyof S>(dispatch: Dispatch<S>, name: N): PartialDispatch<S, N> {
-    return function <P>(root: S, action: PartialAction<S, N, P>, params?: P) {
-        const a: Action<S, P | undefined> = (s, p) => mergeResult(root, name, action(s[name], p!))
-        dispatch(a, params)
-    }
-}
-
 export type AppProps<S> = {
     init: Action<S>,
     view?: View<S>,
@@ -645,11 +616,7 @@ export type AppProps<S> = {
     container: Element
 }
 
-export type Application<S> = {
-    dispatch: Dispatch<S>,
-}
-
-export function app<S>(props: AppProps<S>): Application<S> {
+export function app<S>(props: AppProps<S>) {
     var state: S
     var view = props.view
     var subs = props.subscriptions
@@ -674,11 +641,8 @@ export function app<S>(props: AppProps<S>): Application<S> {
         let result = action(state, params!)
         if (isArray(result)) {
             setState(result[0])
-            let effects = result[1]
-            if (effects) {
-                for (let e of effects) {
-                    e.effect(e, dispatch)
-                }
+            for (let i = 1; i < result.length; i++) {
+                (<EffectObjectBase>result[i]).effect(result[i], dispatch)
             }
         } else {
             setState(result)
@@ -708,10 +672,6 @@ export function app<S>(props: AppProps<S>): Application<S> {
     }
 
     dispatch(props.init)
-
-    return {
-        dispatch,
-    }
 }
 
 export type Children = VNode | string | number | null
