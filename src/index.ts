@@ -530,6 +530,64 @@ var refresh = function (sub: any, oldSub: any, dispatch: any): any {
             : oldSub
 }
 
+export function app<S>(props: AppProps<S>) {
+    var state: S
+    var view = props.view
+    var subs = props.subscriptions
+    var container = props.container
+    var element: Element | Text | undefined = container.children[0]
+    var lastNode = element && recycleElement(element)
+    var lastSub: any[] = []
+    var updateInProgress = false
+
+    var setState = function (newState: S) {
+        if (state !== newState) {
+            state = newState
+
+            if (!updateInProgress) {
+                updateInProgress = true
+                defer(render)
+            }
+        }
+    }
+
+    var dispatch: Dispatch<S> = function <P>(action: Action<S, P>, params?: P) {
+        let result = action(state, params!)
+        if (isArray(result)) {
+            setState(result[0])
+            for (let i = 1; i < result.length; i++) {
+                (<EffectObjectBase>result[i]).effect(result[i], dispatch)
+            }
+        } else {
+            setState(result)
+        }
+    }
+
+    var eventProxy = function(event: any) {
+        event.currentTarget.events[event.type](event)
+    }
+
+    var render = function () {
+        updateInProgress = false
+
+        if (subs) {
+            lastSub = refresh(subs(state), lastSub, dispatch)
+        }
+
+        if (view) {
+            element = patch(
+                container,
+                element,
+                lastNode,
+                (lastNode = view(state, dispatch)),
+                eventProxy
+            )
+        }
+    }
+
+    dispatch(props.init)
+}
+
 export type ActionResult<S> = S | [S, ...EffectObjectBase[]]
 export type Action<S, P = undefined> = (state: S, params: P) => ActionResult<S>
 
@@ -614,64 +672,6 @@ export type AppProps<S> = {
     view?: View<S>,
     subscriptions?: (state: S) => SubscriptionsResult,
     container: Element
-}
-
-export function app<S>(props: AppProps<S>) {
-    var state: S
-    var view = props.view
-    var subs = props.subscriptions
-    var container = props.container
-    var element: Element | Text | undefined = container.children[0]
-    var lastNode = element && recycleElement(element)
-    var lastSub: any[] = []
-    var updateInProgress = false
-
-    var setState = function (newState: S) {
-        if (state !== newState) {
-            state = newState
-
-            if (!updateInProgress) {
-                updateInProgress = true
-                defer(render)
-            }
-        }
-    }
-
-    var dispatch: Dispatch<S> = function <P>(action: Action<S, P>, params?: P) {
-        let result = action(state, params!)
-        if (isArray(result)) {
-            setState(result[0])
-            for (let i = 1; i < result.length; i++) {
-                (<EffectObjectBase>result[i]).effect(result[i], dispatch)
-            }
-        } else {
-            setState(result)
-        }
-    }
-
-    var eventProxy = function(event: any) {
-        event.currentTarget.events[event.type](event)
-    }
-
-    var render = function () {
-        updateInProgress = false
-
-        if (subs) {
-            lastSub = refresh(subs(state), lastSub, dispatch)
-        }
-
-        if (view) {
-            element = patch(
-                container,
-                element,
-                lastNode,
-                (lastNode = view(state, dispatch)),
-                eventProxy
-            )
-        }
-    }
-
-    dispatch(props.init)
 }
 
 export type Children = VNode | string | number | null
