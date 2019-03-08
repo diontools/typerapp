@@ -541,7 +541,7 @@ export function app<S>(props: AppProps<S>) {
     }
 
     var eventCb: EventCb = function (event) {
-        dispatch((event.currentTarget! as any).events![event.type], event)
+        (event.currentTarget! as any).events[event.type](event)
     }
 
     var render = function () {
