@@ -169,7 +169,7 @@ var getKey = function (node: VNode) {
     return node == null ? null : node.key
 }
 
-var createKeyMap = function (children: any[], start: number, end: number) {
+var createKeyMap = function (children: VNode[], start: number, end: number) {
     for (var out: any = {}, key, node; start <= end; start++) {
         if ((key = (node = children[start]).key) != null) {
             out[key] = node
