@@ -23,6 +23,8 @@
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 // TypeScript Version: 2.8
 
+// synced: 2019/03/08
+
 /// <reference path="global.d.ts" />
 
 import * as CSS from 'csstype';
@@ -850,6 +852,7 @@ declare namespace TyperApp {
         rel?: string;
         target?: string;
         type?: string;
+        referrerPolicy?: string;
     }
 
     // tslint:disable-next-line:no-empty-interface
@@ -1714,7 +1717,9 @@ declare global {
             svg: TyperApp.SVGProps<SVGSVGElement>;
 
             animate: TyperApp.SVGProps<SVGElement>; // TODO: It is SVGAnimateElement but is not in TypeScript's lib.dom.d.ts for now.
+            animateMotion: TyperApp.SVGProps<SVGElement>;
             animateTransform: TyperApp.SVGProps<SVGElement>; // TODO: It is SVGAnimateTransformElement but is not in TypeScript's lib.dom.d.ts for now.
+            mpath: TyperApp.SVGProps<SVGElement>;
             circle: TyperApp.SVGProps<SVGCircleElement>;
             clipPath: TyperApp.SVGProps<SVGClipPathElement>;
             defs: TyperApp.SVGProps<SVGDefsElement>;
