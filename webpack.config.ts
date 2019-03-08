@@ -26,8 +26,8 @@ const config: webpack.Configuration = {
       '.tsx',
       '.ts',
       '.js'
-      ],
-      plugins: [new TsconfigPathsPlugin()],
+    ],
+    plugins: [new TsconfigPathsPlugin()],
   },
   plugins: [
     new HtmlWebpackPlugin(),

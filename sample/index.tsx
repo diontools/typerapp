@@ -1,4 +1,4 @@
-import { h, app, Action, Effect, Subscription } from 'typerapp'
+import { h, app, Action } from 'typerapp'
 import { State, initState } from './states'
 import { Delay, Tick } from './effects';
 import * as part from './part'

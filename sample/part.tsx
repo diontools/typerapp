@@ -1,14 +1,16 @@
-import { h, Effect, Subscription, Action, View } from 'typerapp'
+import { h, Action, View, mergeState } from 'typerapp'
 import { State } from './states'
 import { Delay } from './effects';
 
-const Add: Action<State, { amount: number }> = (state, params) => ({
-    ...state,
-    part: { p: state.part.p + params.amount },
-})
+const DelayedCountUp = Delay.createAction<State, {}>(state => mergeState(state, 'part', s => ({ ...s, p: s.p + 1 })))
 
-export const view: View<State> = (state, dispatch) => (
+const Add: Action<State, { amount: number }> = (state, params) => [
+    mergeState(state, 'part', s => ({ ...s, p: s.p + params.amount })),
+    Delay.create({ action: DelayedCountUp, params: {}, interval: 200 })
+]
+
+export const view: View<State> = ({ part: state }, dispatch) => (
     <div>
-        {state.part.p} <button onClick={ev => dispatch(Add, { amount: 1 })}>add</button>
+        {state.p} <button onClick={ev => dispatch(Add, { amount: 1 })}>add</button>
     </div>
 )

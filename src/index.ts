@@ -691,11 +691,9 @@ export interface VNode<Props = {}> {
     type: VNodeType
 }
 
-// declare global {
-//     namespace JSX {
-//         interface Element extends VNode<any> { }
-//         interface IntrinsicElements {
-//             [elemName: string]: any
-//         }
-//     }
-// }
+export function mergeState<S, N extends keyof S>(state: S, key: N, value: (v: S[N]) => S[N]): S {
+    return {
+        ...state,
+        [key]: value(state[key]),
+    }
+}
