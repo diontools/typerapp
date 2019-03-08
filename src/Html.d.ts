@@ -1573,6 +1573,11 @@ declare namespace TyperApp {
 }
 
 declare global {
+    interface Element {
+        style: CSSStyleDeclaration
+        events?: { [key: string]: Function }
+    }
+
     namespace JSX {
         // tslint:disable-next-line:no-empty-interface
         interface Element extends HyperApp.VNode<any> { }
