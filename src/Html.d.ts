@@ -1,34 +1,11 @@
-// Type definitions for React 16.7
-// Project: http://facebook.github.io/react/
-// Definitions by: Asana <https://asana.com>
-//                 AssureSign <http://www.assuresign.com>
-//                 Microsoft <https://microsoft.com>
-//                 John Reilly <https://github.com/johnnyreilly>
-//                 Benoit Benezech <https://github.com/bbenezech>
-//                 Patricio Zavolinsky <https://github.com/pzavolinsky>
-//                 Digiguru <https://github.com/digiguru>
-//                 Eric Anderson <https://github.com/ericanderson>
-//                 Tanguy Krotoff <https://github.com/tkrotoff>
-//                 Dovydas Navickas <https://github.com/DovydasNavickas>
-//                 Stéphane Goetz <https://github.com/onigoetz>
-//                 Josh Rutherford <https://github.com/theruther4d>
-//                 Guilherme Hübner <https://github.com/guilhermehubner>
-//                 Ferdy Budhidharma <https://github.com/ferdaber>
-//                 Johann Rakotoharisoa <https://github.com/jrakotoharisoa>
-//                 Olivier Pascal <https://github.com/pascaloliv>
-//                 Martin Hochel <https://github.com/hotell>
-//                 Frank Li <https://github.com/franklixuefei>
-//                 Jessica Franco <https://github.com/Kovensky>
-//                 Paul Sherman <https://github.com/pshrmn>
-// Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
-// TypeScript Version: 2.8
-
+// Type definitions for Typerapp
+// forked from https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/react
 // synced: 2019/03/08
 
 /// <reference path="global.d.ts" />
 
 import * as CSS from 'csstype';
-import * as HyperApp from '.'
+import { VNode } from '.'
 
 type NativeAnimationEvent = AnimationEvent;
 type NativeClipboardEvent = ClipboardEvent;
@@ -284,7 +261,7 @@ declare namespace TyperApp {
     }
 
     interface DOMAttributes<T> {
-        children?: HyperApp.VNode;
+        children?: VNode;
         dangerouslySetInnerHTML?: {
             __html: string;
         };
@@ -1580,21 +1557,7 @@ declare global {
 
     namespace JSX {
         // tslint:disable-next-line:no-empty-interface
-        interface Element extends HyperApp.VNode<any> { }
-        // interface ElementClass extends HyperTSApp.Component<any> {
-        //     render(): HyperTSApp.ReactNode;
-        // }
-        // interface ElementAttributesProperty { props: {}; }
-        // interface ElementChildrenAttribute { children: {}; }
-
-        // We can't recurse forever because `type` can't be self-referential;
-        // let's assume it's reasonable to do a single React.lazy() around a single React.memo() / vice-versa
-        // type LibraryManagedAttributes<C, P> = C extends HyperTSApp.MemoExoticComponent<infer T> | HyperTSApp.LazyExoticComponent<infer T>
-        //     ? T extends HyperTSApp.MemoExoticComponent<infer U> | HyperTSApp.LazyExoticComponent<infer U>
-        //         ? ReactManagedAttributes<U, P>
-        //         : ReactManagedAttributes<T, P>
-        //     : ReactManagedAttributes<C, P>;
-
+        interface Element extends VNode<any> { }
         // tslint:disable-next-line:no-empty-interface
         interface IntrinsicAttributes extends TyperApp.Attributes { }
         // tslint:disable-next-line:no-empty-interface

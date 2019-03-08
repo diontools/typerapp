@@ -1,3 +1,5 @@
+// forked from https://github.com/jorgebucaran/hyperapp
+
 var DEFAULT_NODE = 0
 var RECYCLED_NODE = 1
 var LAZY_NODE = 2
