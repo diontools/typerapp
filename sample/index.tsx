@@ -1,4 +1,4 @@
-import { h, app, Action } from 'typerapp'
+import { h, app, Action, Lazy } from 'typerapp'
 import { State, initState } from './states'
 import { Delay, Tick } from './effects';
 import * as part from './part'
@@ -41,6 +41,12 @@ const ToggleTimer: Action<State> = state => ({
 
 const Input: Action<State, string> = (state, value) => ({ ...state, input: value })
 
+const lazyView = (p: { auto: State['auto'] }) => (
+    <div>
+        auto update: {new Date().toISOString()}
+    </div>
+)
+
 app({
     init: () => [initState, Delay.create([OnDelayed, { amount: 10 }], { interval: 1000 })],
     view: (state, dispatch) => (
@@ -57,6 +63,9 @@ app({
             </p>
             <p>
                 {part.view(state, dispatch)}
+            </p>
+            <p>
+                {Lazy({ key: 'lazy', render: lazyView, auto: state.auto })}
             </p>
         </div>
     ),
