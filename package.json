@@ -1,8 +1,8 @@
 {
   "name": "typerapp",
-  "version": "0.0.0@alpha.1",
+  "version": "0.0.0-alpha.1",
   "description": "",
-  "main": "index.html",
+  "main": "src/index.ts",
   "scripts": {
     "start": "webpack-dev-server",
     "build": "webpack --mode=development",
@@ -10,7 +10,7 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "csstype": "^2.6.3",
     "typescript": "^3.3.3333"
@@ -26,5 +26,8 @@
     "webpack": "^4.29.6",
     "webpack-cli": "^3.2.3",
     "webpack-dev-server": "^3.2.1"
-  }
+  },
+  "files": [
+    "src"
+  ]
 }
