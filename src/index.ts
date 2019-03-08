@@ -563,33 +563,27 @@ export function app<S>(props: AppProps<S>) {
 
 type EventCb = (ev: Event) => void
 
-export type ActionResult<S> = S | [S, ...EffectObjectBase[]]
+export type ActionResult<S> = S | [S, ...EffectObject<any, any>[]]
 export type Action<S, P = undefined> = (state: S, params: P) => ActionResult<S>
 
+export type EffectAction<S, P, R> = [Action<S, P & R>, P]
+
 export type EffectRunner<RunnerProps, ReturnProps> = <S, P>(
-    props: { action: Action<S, P & ReturnProps>, params: P } & RunnerProps,
+    props: { action: EffectAction<S, P, ReturnProps> } & RunnerProps,
     dispatch: Dispatch<S>
 ) => void
 
-interface EffectObjectBase {
-    effect: EffectRunner<any, any>
-}
-
-interface GenericEffectObjectBase<RunnerProps, ReturnProps> extends EffectObjectBase {
-    effect: EffectRunner<RunnerProps, ReturnProps>
-}
-
-export type EffectObject<RunnerProps, ReturnProps> = GenericEffectObjectBase<RunnerProps, ReturnProps> & RunnerProps
+export type EffectObject<RunnerProps, ReturnProps> = [EffectRunner<RunnerProps, ReturnProps>, RunnerProps]
 
 export class Effect<Props, ReturnProps = {}, RunnerProps = Props> {
     public constructor(
         private runner: EffectRunner<Props, ReturnProps>,
-        private creator: <S, P>(props: { action: Action<S, P & ReturnProps>, params: P } & Props, runner: EffectRunner<Props, ReturnProps>) =>
+        private creator: <S, P>(action: EffectAction<S, P, ReturnProps>, props: Props, runner: EffectRunner<Props, ReturnProps>) =>
             EffectObject<RunnerProps, ReturnProps>) {
     }
 
-    create<S, P>(props: { action: Action<S, P & ReturnProps>, params: P } & Props) {
-        return this.creator(props, this.runner)
+    create<S, P>(action: EffectAction<S, P, ReturnProps>, props: Props) {
+        return this.creator(action, props, this.runner)
     }
 
     createAction<S, P>(action: Action<S, P & ReturnProps>): Action<S, P & ReturnProps> {
@@ -598,29 +592,21 @@ export class Effect<Props, ReturnProps = {}, RunnerProps = Props> {
 }
 
 export type SubscriptionRunner<RunnerProps, ReturnProps> = <S, P>(
-    props: { action: Action<S, P & ReturnProps>, params: P } & RunnerProps,
+    props: { action: EffectAction<S, P, ReturnProps> } & RunnerProps,
     dispatch: Dispatch<S>
 ) => () => void
 
-interface SubscriptionObjectBase {
-    effect: SubscriptionRunner<any, any>
-}
-
-interface GenericSubscriptionObjectBase<RunnerProps, ReturnProps> extends SubscriptionObjectBase {
-    effect: SubscriptionRunner<RunnerProps, ReturnProps>
-}
-
-export type SubscriptionObject<RunnerProps, ReturnProps> = GenericSubscriptionObjectBase<RunnerProps, ReturnProps> & RunnerProps
+export type SubscriptionObject<RunnerProps, ReturnProps> = [SubscriptionRunner<RunnerProps, ReturnProps>, RunnerProps]
 
 export class Subscription<Props, ReturnProps = {}, RunnerProps = Props>{
     public constructor(
         private runner: SubscriptionRunner<Props, ReturnProps>,
-        private creator: <S, P>(props: { action: Action<S, P & ReturnProps>, params: P } & Props, runner: SubscriptionRunner<Props, ReturnProps>) =>
+        private creator: <S, P>(action: EffectAction<S, P, ReturnProps>, props: Props, runner: SubscriptionRunner<Props, ReturnProps>) =>
             SubscriptionObject<RunnerProps, ReturnProps>) {
     }
 
-    create<S, P>(props: { action: Action<S, P & ReturnProps>, params: P } & Props) {
-        return this.creator(props, this.runner)
+    create<S, P>(action: EffectAction<S, P, ReturnProps>, props: Props) {
+        return this.creator(action, props, this.runner)
     }
 
     createAction<S, P = undefined>(action: Action<S, P & ReturnProps>): Action<S, P & ReturnProps> {
@@ -628,7 +614,7 @@ export class Subscription<Props, ReturnProps = {}, RunnerProps = Props>{
     }
 }
 
-export type SubscriptionType = SubscriptionObjectBase | boolean
+export type SubscriptionType = SubscriptionObject<any, any> | boolean
 
 export type SubscriptionsResult =
     | void
