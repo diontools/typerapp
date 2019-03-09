@@ -1551,7 +1551,7 @@ declare namespace TyperApp {
 
 declare global {
     interface Element {
-        style: CSSStyleDeclaration
+        readonly style: CSSStyleDeclaration
         events?: { [key: string]: Function }
     }
 
