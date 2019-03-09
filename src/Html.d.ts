@@ -45,13 +45,6 @@ declare namespace TyperApp {
     interface ClassAttributes<T> extends Attributes {
         ref?: LegacyRef<T>;
     }
-    
-    interface LifecycleEvents<T, E extends HTMLAttributes<T>> {
-        onCreate?: (element: T) => void;
-        onUpdate?: (element: T, oldAttribute: E) => void;
-        onRemove?: (element: T, done: () => void) => void;
-        onDestroy?: (element: T) => void;
-    }
 
     //
     // Event System
@@ -255,7 +248,7 @@ declare namespace TyperApp {
     interface HTMLProps<T> extends AllHTMLAttributes<T>, ClassAttributes<T> {
     }
 
-    type DetailedHTMLProps<E extends HTMLAttributes<T>, T> = ClassAttributes<T> & E & LifecycleEvents<T, E>;
+    type DetailedHTMLProps<E extends HTMLAttributes<T>, T> = ClassAttributes<T> & E;
 
     interface SVGProps<T> extends SVGAttributes<T>, ClassAttributes<T> {
     }
