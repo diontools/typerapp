@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+        "strict": true,
+        "jsx": "react",
+        "jsxFactory": "h",
+        "target": "es5",
+        "lib": [
+            "dom",
+            "es2015"
+        ],
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "baseUrl": ".",
+        "paths": {
+            "typerapp": ["../src"]
+        },
+        "sourceMap": true
+    }
+}
