@@ -1,4 +1,5 @@
 import { h, app, Action, Lazy } from 'typerapp'
+import { Helmet } from 'typerapp/helmet'
 import { State, initState } from './states'
 import { Delay, Tick } from './effects';
 import * as part from './part'
@@ -47,10 +48,21 @@ const lazyView = (p: { auto: State['auto'] }) => (
     </div>
 )
 
+const renderHead = (props: { title: string, base?: string }) => <Helmet>
+    <title>{props.title}</title>
+    <link href="./abc.css" rel="stylesheet" />
+    <style type="text/css">{'p { color: gray }'}</style>
+    <meta charSet="UTF-8" />
+    <script src="/script.js"></script>
+    {props.base && <base href={props.base} />}
+</Helmet>
+
 app({
     init: () => [initState, Delay.create([OnDelayed, { amount: 10 }], { interval: 1000 })],
     view: (state, dispatch) => (
         <div>
+            {Lazy({ key: 'head', render: renderHead, title: state.input, base: state.auto ? 'http://' + state.input : undefined })}
+
             <button onClick={ev => dispatch(Increment)}>increment</button>
             <button onClick={ev => dispatch(Add, { amount: 10 })}>add10</button>
             <button onClick={ev => dispatch(DelayAdd, { interval: 1000, amount: 10 })}>delayAdd</button>

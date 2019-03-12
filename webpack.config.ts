@@ -27,10 +27,10 @@ const config: webpack.Configuration = {
       '.ts',
       '.js'
     ],
-    plugins: [new TsconfigPathsPlugin()],
+    plugins: [new TsconfigPathsPlugin({ configFile: './sample/tsconfig.json' })],
   },
   plugins: [
-    new HtmlWebpackPlugin(),
+    new HtmlWebpackPlugin({ template: './sample/index.html' }),
   ],
   devServer: {
     contentBase: distDir,

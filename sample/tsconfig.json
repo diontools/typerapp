@@ -12,7 +12,8 @@
         "moduleResolution": "node",
         "baseUrl": ".",
         "paths": {
-            "typerapp": ["../src"]
+            "typerapp": ["../src"],
+            "typerapp/*": ["../src/*"]
         },
         "sourceMap": true
     }
