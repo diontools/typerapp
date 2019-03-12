@@ -5,7 +5,7 @@
 /// <reference path="global.d.ts" />
 
 import * as CSS from 'csstype';
-import { VNode } from '.'
+import { VNode, Class } from '.'
 
 type NativeAnimationEvent = AnimationEvent;
 type NativeClipboardEvent = ClipboardEvent;
@@ -468,7 +468,7 @@ declare namespace TyperApp {
 
         // Standard HTML Attributes
         accessKey?: string;
-        className?: string;
+        class?: Class;
         contentEditable?: boolean;
         contextMenu?: string;
         dir?: string;

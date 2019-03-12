@@ -51,7 +51,7 @@ const lazyView = (p: { auto: State['auto'] }) => (
 const renderHead = (props: { title: string, base?: string }) => <Helmet>
     <title>{props.title}</title>
     <link href="./abc.css" rel="stylesheet" />
-    <style type="text/css">{'p { color: gray }'}</style>
+    <style type="text/css">{'.lazy-view { color: gray } .auto { font-weight: bold }'}</style>
     <meta charSet="UTF-8" />
     <script src="/script.js"></script>
     {props.base && <base href={props.base} />}
@@ -66,7 +66,7 @@ app({
             <button onClick={ev => dispatch(Increment)}>increment</button>
             <button onClick={ev => dispatch(Add, { amount: 10 })}>add10</button>
             <button onClick={ev => dispatch(DelayAdd, { interval: 1000, amount: 10 })}>delayAdd</button>
-            <button onClick={ev => dispatch(ToggleTimer)}>auto:{state.auto ? 'true' : 'false'}</button>
+            <button onClick={ev => dispatch(ToggleTimer)} class={{ auto: state.auto }}>auto:{state.auto ? 'true' : 'false'}</button>
             <p>value: {state.value}</p>
             <p>text: {state.text}</p>
             <p>count: {state.count}</p>
@@ -76,7 +76,7 @@ app({
             <p>
                 {part.view(state, dispatch)}
             </p>
-            <p>
+            <p class={'lazy-view'}>
                 {Lazy({ key: 'lazy', render: lazyView, auto: state.auto })}
             </p>
         </div>
