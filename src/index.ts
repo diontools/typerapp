@@ -439,7 +439,7 @@ export var Lazy = function <P extends { key: string, render: (props: P) => VNode
     } as LazyVNode<P>
 }
 
-export var h = function (name: string | Function, props: any) {
+export var h = function (name: string | Function, props: any): VNode {
     var node
     var rest = []
     var children = []
