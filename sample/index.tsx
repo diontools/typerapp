@@ -67,18 +67,18 @@ app({
             <button onClick={ev => dispatch(Add, { amount: 10 })}>add10</button>
             <button onClick={ev => dispatch(DelayAdd, { interval: 1000, amount: 10 })}>delayAdd</button>
             <button onClick={ev => dispatch(ToggleTimer)} class={{ auto: state.auto }}>auto:{state.auto ? 'true' : 'false'}</button>
-            <p>value: {state.value}</p>
-            <p>text: {state.text}</p>
-            <p>count: {state.count}</p>
-            <p>
+            <div style={{ fontSize: '20px' }}>value: {state.value}</div>
+            <div>text: {state.text}</div>
+            <div>count: {state.count}</div>
+            <div>
                 input: <input type="text" value={state.input} onInput={ev => dispatch(Input, ev.currentTarget.value)} /> → {state.input}
-            </p>
-            <p>
+            </div>
+            <div>
                 {part.view(state, dispatch)}
-            </p>
-            <p class={'lazy-view'}>
+            </div>
+            <div class={'lazy-view'}>
                 {Lazy({ key: 'lazy', render: lazyView, auto: state.auto })}
-            </p>
+            </div>
         </div>
     ),
     subscriptions: state => state.auto && Tick.create([OnTimer, undefined], { interval: 500 }),
