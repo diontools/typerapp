@@ -255,9 +255,6 @@ declare namespace TyperApp {
 
     interface DOMAttributes<T> {
         children?: VNode;
-        dangerouslySetInnerHTML?: {
-            __html: string;
-        };
 
         // Clipboard Events
         onCopy?: ClipboardEventHandler<T>;
