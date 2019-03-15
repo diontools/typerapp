@@ -457,12 +457,6 @@ declare namespace TyperApp {
     }
 
     interface HTMLAttributes<T> extends DOMAttributes<T> {
-        // React-specific Attributes
-        defaultChecked?: boolean;
-        defaultValue?: string | string[];
-        suppressContentEditableWarning?: boolean;
-        suppressHydrationWarning?: boolean;
-
         // Standard HTML Attributes
         accessKey?: string;
         class?: Class;
