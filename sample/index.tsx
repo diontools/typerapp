@@ -81,6 +81,6 @@ app({
             </div>
         </div>
     ),
-    subscriptions: state => state.auto && Tick.create([OnTimer, undefined], { interval: 500 }),
+    subscriptions: state => [state.auto && Tick.create([OnTimer, undefined], { interval: 500 })],
     container: document.body,
 })
