@@ -2,6 +2,11 @@
 
 /// <reference path="Html.d.ts" />
 
+export var propConv: { [name: string]: string } = {
+    acceptCharset: 'accept-charset',
+    httpEquiv: 'http-equiv',
+}
+
 var DEFAULT_NODE = 0
 var RECYCLED_NODE = 1
 var LAZY_NODE = 2
@@ -113,9 +118,9 @@ var updateProperty = function (element: Element, name: string, value: any, newVa
             newValue === false ||
             (name === "class" && !(newValue = createClass(newValue)))
         ) {
-            element.removeAttribute(name)
+            element.removeAttribute(propConv[name] || name.toLowerCase())
         } else {
-            element.setAttribute(name, newValue)
+            element.setAttribute(propConv[name] || name.toLowerCase(), newValue)
         }
     }
 }
@@ -449,7 +454,8 @@ export var app = function <S>(props: AppProps<S>) {
 
     var setState = function (newState: S) {
         if (!(state === newState || lock)) {
-            defer(render, (lock = true) as any)
+            lock = true
+            defer(render)
         }
         state = newState
     }
