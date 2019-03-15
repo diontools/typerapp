@@ -50,9 +50,11 @@ const lazyView = (p: { auto: State['auto'] }) => (
 
 const renderHead = (props: { title: string, base?: string }) => <Helmet>
     <title>{props.title}</title>
+    <meta charSet="UTF-8" />
+    <meta httpEquiv="content-language" content="ja" />
+    <meta httpEquiv="X-UA-Compatible" content="IE=edge"/>
     <link href="./abc.css" rel="stylesheet" />
     <style type="text/css">{'.lazy-view { color: gray } .auto { font-weight: bold }'}</style>
-    <meta charSet="UTF-8" />
     <script src="/script.js"></script>
     {props.base && <base href={props.base} />}
 </Helmet>
@@ -71,7 +73,8 @@ app({
             <div>text: {state.text}</div>
             <div>count: {state.count}</div>
             <div>
-                input: <input type="text" value={state.input} onInput={ev => dispatch(Input, ev.currentTarget.value)} /> → {state.input}
+                <label for="input">input:</label>
+                <input id="input" type="text" value={state.input} onInput={ev => dispatch(Input, ev.currentTarget.value)} /> → {state.input}
             </div>
             <div>
                 {part.view(state, dispatch)}

@@ -1,14 +1,12 @@
-import { h, VNode, VNodeType } from '..'
+import { h, VNode, VNodeType, propConv } from '..'
+
+function debug(...args: any[]) {
+    //console.log(...args)
+}
 
 export function Helmet(props: {}, children: VNode[]) {
     updateNodes(children, document.head)
     return h('template', {})
-}
-
-function createAttr(name: string, value: string): Attr {
-    const attr = document.createAttribute(name)
-    attr.value = value
-    return attr
 }
 
 function createElement(node: VNode): Element | Text {
@@ -17,7 +15,7 @@ function createElement(node: VNode): Element | Text {
     } else {
         const element = document.createElement(node.name)
         for (const key in node.props) {
-            element.attributes.setNamedItem(createAttr(key, node.props[key]))
+            element.setAttribute(propConv[key] || key.toLowerCase(), node.props[key])
         }
         for (const child of node.children) {
             element.appendChild(createElement(child))
@@ -27,22 +25,35 @@ function createElement(node: VNode): Element | Text {
 }
 
 function updateElement(vNode: VNode, element: Element) {
-    for (const key in getKeys(vNode.props, element.attributes)) {
-        const propValue = vNode.props[key]
-        if (propValue) {
-            const elementValue = element.attributes.getNamedItem(key)!
-            if (elementValue) {
-                if (propValue !== elementValue.value) {
-                    console.log('update', vNode, key, propValue)
-                    elementValue.value = propValue
+    const usedNames: string[] = []
+    for (const key in vNode.props) {
+        const value = vNode.props[key]
+        const name = propConv[key] || key.toLowerCase()
+        if (value) {
+            const attr = element.getAttributeNode(name)
+            if (attr) {
+                if (value !== attr.value) {
+                    debug('update', vNode, name, value)
+                    attr.value = value
                 }
             } else {
-                console.log('create attr', vNode, key, propValue)
-                element.attributes.setNamedItem(createAttr(key, propValue))
+                debug('create attr', vNode, name, value)
+                element.setAttribute(name, value)
             }
+            usedNames.push(name)
         } else {
-            console.log('remove attr', vNode, key)
-            element.attributes.removeNamedItem(key)
+            debug('remove attr', vNode, name)
+            element.removeAttribute(name)
+        }
+    }
+
+    for (let i = 0; i < element.attributes.length;) {
+        const attr = element.attributes[i]
+        if (usedNames.includes(attr.name)) {
+            i++
+        } else {
+            debug('remove attr', element, name)
+            element.removeAttributeNode(attr)
         }
     }
 
@@ -59,12 +70,12 @@ function updateNodes(children: VNode[], parentNode: Node) {
                 if (vNode.type === VNodeType.TEXT) {
                     // update text
                     if (vNode.name !== childText.textContent) {
-                        console.log('update text', vNode)
+                        debug('update text', vNode)
                         childText.textContent = vNode.name
                     }
                 } else {
                     // replace
-                    console.log('replace', i, vNode)
+                    debug('replace', i, vNode)
                     parentNode.replaceChild(createElement(vNode), childNode)
                 }
             } else {
@@ -74,32 +85,20 @@ function updateNodes(children: VNode[], parentNode: Node) {
                     updateElement(vNode, childElement)
                 } else {
                     // replace
-                    console.log('replace', i, vNode)
+                    debug('replace', i, vNode)
                     parentNode.replaceChild(createElement(vNode), childElement)
                 }
             }
         } else {
             // add
-            console.log('add', i, vNode)
+            debug('add', i, vNode)
             parentNode.appendChild(createElement(vNode))
         }
     }
 
     // clean up
     for (let i = children.length; i < parentNode.childNodes.length;) {
-        console.log('remove', parentNode.childNodes.length - 1, parentNode.childNodes[parentNode.childNodes.length - 1])
+        debug('remove', parentNode.childNodes.length - 1, parentNode.childNodes[parentNode.childNodes.length - 1])
         parentNode.removeChild(parentNode.childNodes[parentNode.childNodes.length - 1])
     }
-}
-
-function getKeys(obj: any, n: NamedNodeMap) {
-    var target = <any>{}
-
-    for (let i = 0; i < n.length; i++) {
-        target[n[i].name] = 1
-    }
-
-    for (let i in obj) target[i] = 1
-
-    return target
 }
