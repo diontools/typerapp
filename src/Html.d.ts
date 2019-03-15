@@ -1211,7 +1211,7 @@ declare namespace TyperApp {
     interface SVGAttributes<T> extends DOMAttributes<T> {
         // Attributes which also defined in HTMLAttributes
         // See comment in SVGDOMPropertyConfig.js
-        className?: string;
+        class?: Class;
         color?: string;
         height?: number | string;
         id?: string;
