@@ -2,9 +2,12 @@
 
 /// <reference path="Html.d.ts" />
 
-export var propConv: { [name: string]: string } = {
-    acceptCharset: 'accept-charset',
-    httpEquiv: 'http-equiv',
+export function convName(name: string) {
+    switch (name) {
+        case 'acceptCharset': return 'accept-charset'
+        case 'httpEquiv': return 'http-equiv'
+        default: return name.toLowerCase()
+    }
 }
 
 var DEFAULT_NODE = 0
@@ -118,9 +121,9 @@ var updateProperty = function (element: Element, name: string, value: any, newVa
             newValue === false ||
             (name === "class" && !(newValue = createClass(newValue)))
         ) {
-            element.removeAttribute(propConv[name] || name.toLowerCase())
+            element.removeAttribute(convName(name))
         } else {
-            element.setAttribute(propConv[name] || name.toLowerCase(), newValue)
+            element.setAttribute(convName(name), newValue)
         }
     }
 }

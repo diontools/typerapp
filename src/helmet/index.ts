@@ -1,4 +1,4 @@
-import { h, VNode, VNodeType, propConv } from '..'
+import { h, VNode, VNodeType, convName } from '..'
 
 function debug(...args: any[]) {
     //console.log(...args)
@@ -15,7 +15,7 @@ function createElement(node: VNode): Element | Text {
     } else {
         const element = document.createElement(node.name)
         for (const key in node.props) {
-            element.setAttribute(propConv[key] || key.toLowerCase(), node.props[key])
+            element.setAttribute(convName(key), node.props[key])
         }
         for (const child of node.children) {
             element.appendChild(createElement(child))
@@ -28,7 +28,7 @@ function updateElement(vNode: VNode, element: Element) {
     const usedNames: string[] = []
     for (const key in vNode.props) {
         const value = vNode.props[key]
-        const name = propConv[key] || key.toLowerCase()
+        const name = convName(key)
         if (value) {
             const attr = element.getAttributeNode(name)
             if (attr) {
