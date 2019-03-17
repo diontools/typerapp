@@ -496,7 +496,7 @@ export var Lazy = function <P extends { key: string, render: (props: P) => VNode
     } as LazyVNode<P>
 }
 
-export var h = function (name: string | Function, props: any): VNode {
+export var h = function (name: string | Function, props: any, _children?: any): VNode {
     for (var node, rest = [], children = [], i = arguments.length; i-- > 2;) {
         rest.push(arguments[i])
     }
