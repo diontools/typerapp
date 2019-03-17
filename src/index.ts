@@ -2,12 +2,13 @@
 
 /// <reference path="Html.d.ts" />
 
-export function convName(name: string) {
-    switch (name) {
-        case 'acceptCharset': return 'accept-charset'
-        case 'httpEquiv': return 'http-equiv'
-        default: return name.toLowerCase()
-    }
+const aliases: { [name: string]: string } = {
+    acceptCharset: 'accept-charset',
+    httpEquiv: 'http-equiv',
+}
+
+export function convName(name: string, isSvg?: boolean) {
+    return aliases[name] || name.toLowerCase()
 }
 
 var DEFAULT_NODE = 0
