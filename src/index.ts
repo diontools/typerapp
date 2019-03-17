@@ -585,14 +585,6 @@ export interface VNode<Props extends VNodeProps = VNodeProps> {
     render?: () => VNode
 }
 
-export interface TextVNode extends VNode {
-    type: VNodeType.TEXT
-}
-
-export interface RecycledVNode extends VNode {
-    type: VNodeType.RECYCLED
-}
-
 export interface LazyVNode<P> extends VNode {
     lazy: P
     render: () => VNode
