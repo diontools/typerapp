@@ -741,7 +741,7 @@ declare namespace TyperApp {
         high?: number;
         href?: string;
         hrefLang?: string;
-        for?: string;
+        htmlFor?: string;
         httpEquiv?: string;
         integrity?: string;
         keyParams?: string;
@@ -992,7 +992,7 @@ declare namespace TyperApp {
 
     interface LabelHTMLAttributes<T> extends HTMLAttributes<T> {
         form?: string;
-        for?: string;
+        htmlFor?: string;
     }
 
     interface LiHTMLAttributes<T> extends HTMLAttributes<T> {
@@ -1085,7 +1085,7 @@ declare namespace TyperApp {
 
     interface OutputHTMLAttributes<T> extends HTMLAttributes<T> {
         form?: string;
-        for?: string;
+        htmlFor?: string;
         name?: string;
     }
 

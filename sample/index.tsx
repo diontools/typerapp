@@ -73,7 +73,7 @@ app({
             <div>text: {state.text}</div>
             <div>count: {state.count}</div>
             <div>
-                <label for="input">input:</label>
+                <label htmlFor="input">input:</label>
                 <input id="input" type="text" value={state.input} onInput={ev => dispatch(Input, ev.currentTarget.value)} /> → {state.input}
             </div>
             <div>
