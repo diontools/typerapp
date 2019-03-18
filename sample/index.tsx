@@ -73,10 +73,10 @@ const StyledText = style('div')({
 })
 
 app({
-    init: () => [initState, Delay.create([OnDelayed, { amount: 10 }], { interval: 1000 })],
+    init: () => initState,
     view: (state, dispatch) => (
         <div>
-            {Lazy({ key: 'head', render: renderHead, title: state.input, base: state.auto ? 'http://' + state.input : undefined })}
+            <Lazy key="head" render={renderHead} title={state.input} base={state.auto ? 'http://' + state.input : undefined} />
 
             <button onClick={ev => dispatch(Increment)}>increment</button>
             <button onClick={ev => dispatch(Add, { amount: 10 })}>add10</button>
