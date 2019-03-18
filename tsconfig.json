@@ -12,13 +12,10 @@
         "moduleResolution": "node",
         "baseUrl": ".",
         "paths": {
-            "typerapp": ["./src"]
+            "typerapp": ["./src"],
+            "typerapp/*": ["./"]
         },
         "sourceMap": true,
-        "outDir": "dist",
-        "declaration": true
-    },
-    "include": [
-        "src"
-    ]
+        "noEmit": true
+    }
 }

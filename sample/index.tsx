@@ -1,8 +1,8 @@
 import { h, app, Action, Lazy } from 'typerapp'
 import { Helmet } from 'typerapp/helmet'
 import style from 'typerapp/style'
+import { Delay, Tick, HttpText } from 'typerapp/fx';
 import { State, initState } from './states'
-import { Delay, Tick } from './effects';
 import * as part from './part'
 
 const Increment: Action<State> = state => ({
@@ -43,6 +43,16 @@ const ToggleTimer: Action<State> = state => ({
 
 const Input: Action<State, string> = (state, value) => ({ ...state, input: value })
 
+const OnTextResponse = HttpText.createAction<State>((state, params) => ({
+    ...state,
+    text: params.text
+}))
+
+const Request: Action<State> = state => [
+    state,
+    HttpText.create([OnTextResponse, undefined], ['./', { method: 'GET' }])
+]
+
 const lazyView = (p: { auto: State['auto'] }) => (
     <div>
         auto update: {new Date().toISOString()}
@@ -82,6 +92,7 @@ app({
             <button onClick={ev => dispatch(Add, { amount: 10 })}>add10</button>
             <button onClick={ev => dispatch(DelayAdd, { interval: 1000, amount: 10 })}>delayAdd</button>
             <button onClick={ev => dispatch(ToggleTimer)} class={{ auto: state.auto }}>auto:{state.auto ? 'true' : 'false'}</button>
+            <button onClick={ev => dispatch(Request)}>http requst</button>
             <div style={{ fontSize: '20px' }}>value: {state.value}</div>
             <div>text: {state.text}</div>
             <div>count: {state.count}</div>

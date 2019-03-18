@@ -30,6 +30,7 @@
   "files": [
     "src",
     "helmet",
-    "style"
+    "style",
+    "fx"
   ]
 }

@@ -592,7 +592,7 @@ export class Effect<Props, ReturnProps = {}, RunnerProps = Props> {
         return this.creator(action, props, this.runner)
     }
 
-    createAction<S, P>(action: Action<S, P & ReturnProps>): Action<S, P & ReturnProps> {
+    createAction<S, P = undefined>(action: Action<S, P & ReturnProps>): Action<S, P & ReturnProps> {
         return action
     }
 }
