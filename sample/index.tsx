@@ -93,6 +93,7 @@ app({
             <button onClick={ev => dispatch(DelayAdd, { interval: 1000, amount: 10 })}>delayAdd</button>
             <button onClick={ev => dispatch(ToggleTimer)} class={{ auto: state.auto }}>auto:{state.auto ? 'true' : 'false'}</button>
             <button onClick={ev => dispatch(Request)}>http requst</button>
+            <button onClick={ev => dispatch([state, HttpText.create([OnTextResponse, undefined], ['./', { method: 'GET' }])])}>http requst2</button>
             <div style={{ fontSize: '20px' }}>value: {state.value}</div>
             <div>text: {state.text}</div>
             <div>count: {state.count}</div>

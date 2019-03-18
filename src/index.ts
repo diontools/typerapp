@@ -628,6 +628,7 @@ export type SubscriptionsResult =
 export type Dispatch<S> = {
     <P>(action: Action<S, P>, params: P): void
     (action: Action<S, undefined>): void
+    (result: ActionResult<S>): void
 }
 
 export type View<S> = (state: S, dispatch: Dispatch<S>) => VNode
