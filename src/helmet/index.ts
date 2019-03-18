@@ -4,8 +4,10 @@ function debug(...args: any[]) {
     //console.log(...args)
 }
 
+const id = 'h-n'
+
 export function Helmet(props: {}, children: VNode[]) {
-    updateNodes(children, document.head)
+    updateNodes(children, document.head, false)
     return h('template', {})
 }
 
@@ -14,6 +16,7 @@ function createElement(node: VNode): Element | Text {
         return document.createTextNode(node.name)
     } else {
         const element = document.createElement(node.name)
+        element.setAttribute(id, '')
         for (const key in node.props) {
             element.setAttribute(convName(key), node.props[key])
         }
@@ -49,7 +52,7 @@ function updateElement(vNode: VNode, element: Element) {
 
     for (let i = 0; i < element.attributes.length;) {
         const attr = element.attributes[i]
-        if (usedNames.includes(attr.name)) {
+        if (attr.name === id || usedNames.includes(attr.name)) {
             i++
         } else {
             debug('remove attr', element, name)
@@ -57,14 +60,16 @@ function updateElement(vNode: VNode, element: Element) {
         }
     }
 
-    updateNodes(vNode.children, element)
+    updateNodes(vNode.children, element, true)
 }
 
-function updateNodes(children: VNode[], parentNode: Node) {
+function updateNodes(children: VNode[], parentNode: Node, isChild: boolean) {
+    const childNodes = isChild ? parentNode.childNodes : getChildNodes(parentNode)
+
     for (let i = 0; i < children.length; i++) {
         const vNode = children[i]
-        if (i < parentNode.childNodes.length) {
-            const childNode = parentNode.childNodes[i]
+        if (i < childNodes.length) {
+            const childNode = childNodes[i]
             if (childNode.nodeType === childNode.TEXT_NODE) {
                 const childText = <Text>childNode
                 if (vNode.type === VNodeType.TEXT) {
@@ -97,8 +102,19 @@ function updateNodes(children: VNode[], parentNode: Node) {
     }
 
     // clean up
-    for (let i = children.length; i < parentNode.childNodes.length;) {
-        debug('remove', parentNode.childNodes.length - 1, parentNode.childNodes[parentNode.childNodes.length - 1])
-        parentNode.removeChild(parentNode.childNodes[parentNode.childNodes.length - 1])
+    for (let i = children.length; i < childNodes.length; i++) {
+        debug('remove', i, childNodes[i])
+        parentNode.removeChild(childNodes[i])
     }
+}
+
+function getChildNodes(node: Node): Node[] {
+    let result: Node[] = []
+    for (let i = 0; i < node.childNodes.length; i++) {
+        const n = node.childNodes[i];
+        if (n.nodeType !== Node.TEXT_NODE && (<Element>n).hasAttribute(id)) {
+            result.push(n)
+        }
+    }
+    return result
 }

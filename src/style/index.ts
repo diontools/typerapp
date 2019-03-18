@@ -4,8 +4,7 @@ import { h, VNode } from '..'
 import * as CSS from 'csstype'
 
 let _id = 0
-export const styleRoot = document.head.appendChild(document.createElement("style"))
-const sheet = <CSSStyleSheet>styleRoot.sheet
+const sheet = <CSSStyleSheet>document.head.appendChild(document.createElement("style")).sheet
 
 function hyphenate(str: string) {
     return str.replace(/[A-Z]/g, "-$&").toLowerCase()
@@ -64,7 +63,7 @@ export default function <K extends keyof HTMLElementTagNameMap>(nodeName: K) {
     var cache: { [key: string]: string } = {}
     return function (decls: ((props: any) => Style) | Style) {
         return function (props?: any, children?: VNode[]) {
-            props = props || {}
+            props = isEmpty(props) ? {} : props
             //children = attributes.children || children
             var nodeDecls = typeof decls == "function" ? decls(props) : decls
             var key = JSON.stringify(nodeDecls)
@@ -79,4 +78,9 @@ export function keyframes(obj: any) {
     var id = "p" + _id++
     insert(wrap(parse(obj, id, 1).join(""), "@keyframes " + id))
     return id
+}
+
+function isEmpty(obj: any): boolean {
+    for (var i in obj) return false;
+    return true;
 }
