@@ -583,8 +583,8 @@ export type EffectObject<RunnerProps, ReturnProps> = [EffectRunner<RunnerProps, 
 
 export class Effect<Props, ReturnProps = {}, RunnerProps = Props> {
     public constructor(
-        private runner: EffectRunner<Props, ReturnProps>,
-        private creator: <S, P>(action: EffectAction<S, P, ReturnProps>, props: Props, runner: EffectRunner<Props, ReturnProps>) =>
+        private runner: EffectRunner<RunnerProps, ReturnProps>,
+        private creator: <S, P>(action: EffectAction<S, P, ReturnProps>, props: Props, runner: EffectRunner<RunnerProps, ReturnProps>) =>
             EffectObject<RunnerProps, ReturnProps>) {
     }
 
