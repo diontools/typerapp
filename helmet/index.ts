@@ -52,7 +52,7 @@ function updateElement(vNode: VNode, element: Element) {
 
     for (let i = 0; i < element.attributes.length;) {
         const attr = element.attributes[i]
-        if (attr.name === id || usedNames.includes(attr.name)) {
+        if (attr.name === id || usedNames.indexOf(attr.name) >= 0) {
             i++
         } else {
             debug('remove attr', element, name)
