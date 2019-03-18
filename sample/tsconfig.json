@@ -13,7 +13,7 @@
         "baseUrl": ".",
         "paths": {
             "typerapp": ["../src"],
-            "typerapp/*": ["../src/*"]
+            "typerapp/*": ["../*"]
         },
         "sourceMap": true
     }

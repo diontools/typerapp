@@ -3,7 +3,7 @@ import * as path from 'path'
 import { TsconfigPathsPlugin } from 'tsconfig-paths-webpack-plugin'
 import * as HtmlWebpackPlugin from 'html-webpack-plugin'
 
-const distDir = path.resolve(__dirname, 'dist')
+const distDir = path.resolve(__dirname, 'sample-dist')
 
 const config: webpack.Configuration = {
   entry: './sample/index.tsx',

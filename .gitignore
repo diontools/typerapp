@@ -83,4 +83,4 @@ typings/
 package-lock.json
 
 # dist
-dist/
+sample-dist/
