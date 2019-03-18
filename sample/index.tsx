@@ -1,7 +1,7 @@
 import { h, app, Action, Lazy } from 'typerapp'
 import { Helmet } from 'typerapp/helmet'
 import style from 'typerapp/style'
-import { Delay, Tick, HttpText } from 'typerapp/fx';
+import { Delay, Timer, HttpText } from 'typerapp/fx';
 import { State, initState } from './states'
 import * as part from './part'
 
@@ -25,11 +25,11 @@ const OnDelayed = Delay.createAction<State, { amount: number }>((state, params) 
 
 const DelayAdd: Action<State, { interval: number, amount: number }> = (state, params) => [
     state,
-    Delay.create([OnDelayed, { amount: params.amount }], { interval: params.interval }),
+    Delay.create([OnDelayed, { amount: params.amount }], { duration: params.interval }),
 ]
 
 
-const OnTimer = Tick.createAction<State>((state, params) => ({
+const OnTimer = Timer.createAction<State>((state, params) => ({
     ...state,
     value: state.value + 1,
     count: params.count,
@@ -116,6 +116,6 @@ app({
             </div>
         </div>
     ),
-    subscriptions: state => [state.auto && Tick.create([OnTimer, undefined], { interval: 500 })],
+    subscriptions: state => [state.auto && Timer.create([OnTimer, undefined], { interval: 500 })],
     container: document.body,
 })

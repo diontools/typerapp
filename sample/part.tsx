@@ -6,7 +6,7 @@ const DelayedCountUp = Delay.createAction<State, {}>(state => mergeState(state, 
 
 const Add: Action<State, { amount: number }> = (state, params) => [
     mergeState(state, 'part', s => ({ ...s, p: s.p + params.amount })),
-    Delay.create([DelayedCountUp, {}], { interval: 200 })
+    Delay.create([DelayedCountUp, {}], { duration: 200 })
 ]
 
 export const view: View<State> = ({ part: state }, dispatch) => (
