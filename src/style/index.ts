@@ -64,7 +64,6 @@ export default function <K extends keyof HTMLElementTagNameMap>(nodeName: K) {
     return function (decls: ((props: any) => Style) | Style) {
         return function (props?: any, children?: VNode[]) {
             props = isEmpty(props) ? {} : props
-            //children = attributes.children || children
             var nodeDecls = typeof decls == "function" ? decls(props) : decls
             var key = JSON.stringify(nodeDecls)
             cache[key] || (cache[key] = createStyle(nodeDecls))

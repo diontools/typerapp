@@ -51,7 +51,6 @@ const lazyView = (p: { auto: State['auto'] }) => (
 
 const renderHead = (props: { title: string, base?: string }) => <Helmet>
     <title>{props.title}</title>
-    <meta charSet="UTF-8" />
     <meta httpEquiv="content-language" content="ja" />
     <style type="text/css">{'.lazy-view { color: gray } .auto { font-weight: bold }'}</style>
     {props.base && <base href={props.base} />}
