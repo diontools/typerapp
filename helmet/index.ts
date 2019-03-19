@@ -8,7 +8,9 @@ const id = 'h-n'
 
 export function Helmet(props: {}, children: VNode[]) {
     updateNodes(children, document.head, false)
-    return h('template', {})
+    const n = h('', null)
+    n.type = VNodeType.TEXT // force TEXT VNode
+    return n
 }
 
 function createElement(node: VNode): Element | Text {
