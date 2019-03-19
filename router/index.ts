@@ -1,17 +1,19 @@
 import { h, Dispatch, VNode, Subscription, Effect, Action } from '..'
 
-export interface RouterProps<S> {
-    routes: Route<S>[],
-    matched: (route: Route<S> | undefined, dispatch: Dispatch<S>) => void,
+export interface RouterProps<S, P> {
+    routes: Route<S, P>[],
+    matched: (route: Route<S, P> | undefined, dispatch: Dispatch<S>) => void,
 }
 
-export interface Route<S> {
+export type Route<S, P> = {
     path: string
-    view: (state: S) => VNode
+    view: (state: S, dispatch: Dispatch<S>) => VNode
+} & {
+    [N in keyof P]: P[N]
 }
 
-export function createRouter<S>(props: RouterProps<S>) {
-    const subs = new Subscription<RouterProps<S>>(
+export function createRouter<S, P>(props: RouterProps<S, P>) {
+    const subs = new Subscription<RouterProps<S, P>>(
         (props, dispatch) => {
             console.log('routing')
             function onLocationChanged() {

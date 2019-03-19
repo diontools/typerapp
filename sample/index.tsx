@@ -3,7 +3,7 @@ import { Helmet } from 'typerapp/helmet'
 import { style } from 'typerapp/style'
 import { Delay, Timer, HttpText } from 'typerapp/fx';
 import { createRouter, Link, Route } from 'typerapp/router'
-import { State, initState } from './states'
+import { State, initState, RouteProps } from './states'
 import * as part from './part'
 
 const Increment: Action<State> = state => ({
@@ -43,7 +43,7 @@ const lazyView = (p: { auto: State['auto'] }) => (
 )
 
 const renderHead = (props: { title: string }) => <Helmet>
-    <title>{props.title}</title>
+    <title>Typerapp - {props.title}</title>
     <meta httpEquiv="content-language" content="ja" />
     <style>{'.auto{font-weight:bold}'}</style>
 </Helmet>
@@ -64,18 +64,20 @@ const StyledText = style<{ color: string }>('div')(props => ({
     },
 }))
 
-const SetRoute: Action<State, Route<State> | undefined> = (state, route) => ({
+const SetRoute: Action<State, Route<State, RouteProps> | undefined> = (state, route) => ({
     ...state,
     route,
 })
 
-const router = createRouter<State>({
+const router = createRouter<State, RouteProps>({
     routes: [{
+        title: 'HOME',
         path: '/',
-        view: state => <div>home</div>,
+        view: (state, dispatch) => <div>home</div>,
     }, {
+        title: 'PAGE1',
         path: '/page1',
-        view: state => <div>page1</div>,
+        view: (state, dispatch) => <div>page1</div>,
     }],
     matched: (route, dispatch) => dispatch(SetRoute, route),
 })
@@ -84,7 +86,7 @@ app({
     init: () => initState,
     view: (state, dispatch) => (
         <div>
-            <Lazy key="head" render={renderHead} title={state.input} />
+            <Lazy key="head" render={renderHead} title={state.route ? state.route.title : '404'} />
 
             <button onClick={ev => dispatch(Increment)}>increment</button>
             <button onClick={ev => dispatch(Add, { amount: 10 })}>add10</button>
@@ -119,7 +121,7 @@ app({
                     <li><Link to="/page1" dispatch={dispatch}>page1</Link></li>
                     <li><Link to="/unknown" dispatch={dispatch}>unknown</Link></li>
                 </ul>
-                {state.route ? state.route.view(state) : <div>404</div>}
+                {state.route ? state.route.view(state, dispatch) : <div>404</div>}
             </div>
         </div>
     ),

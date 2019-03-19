@@ -1,6 +1,21 @@
 import { Route } from 'typerapp/router'
 
-export const initState = {
+export type RouteProps = {
+    title: string
+}
+
+export type State = {
+    value: number,
+    text: string,
+    auto: boolean,
+    input: string,
+    part: {
+        p: number,
+    },
+    route?: Route<State, RouteProps>,
+}
+
+export const initState: State = {
     value: 1,
     text: '',
     auto: false,
@@ -8,7 +23,5 @@ export const initState = {
     part: {
         p: 0,
     },
-    route: undefined as Route<any> | undefined
+    route: undefined,
 }
-
-export type State = typeof initState
