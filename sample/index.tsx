@@ -30,16 +30,15 @@ const OnTextResponse = HttpText.createAction<State>((state, params) => ({
 }))
 
 const lazyView = (p: { auto: State['auto'] }) => (
-    <div>
-        auto update: {new Date().toISOString()}
+    <div class={{ auto: p.auto }}>
+        change at: {new Date().toISOString()}
     </div>
 )
 
-const renderHead = (props: { title: string, base?: string }) => <Helmet>
+const renderHead = (props: { title: string }) => <Helmet>
     <title>{props.title}</title>
     <meta httpEquiv="content-language" content="ja" />
-    <style type="text/css">{'.lazy-view { color: gray } .auto { font-weight: bold }'}</style>
-    {props.base && <base href={props.base} />}
+    <style>{'.auto{font-weight:bold}'}</style>
 </Helmet>
 
 const Wrapper = style('div')({
@@ -62,13 +61,15 @@ app({
     init: () => initState,
     view: (state, dispatch) => (
         <div>
-            <Lazy key="head" render={renderHead} title={state.input} base={state.auto ? 'http://' + state.input : undefined} />
+            <Lazy key="head" render={renderHead} title={state.input} />
 
             <button onClick={ev => dispatch(Increment)}>increment</button>
             <button onClick={ev => dispatch(Add, { amount: 10 })}>add10</button>
             <button onClick={ev => dispatch(AddWithDelay, { duration: 1000, amount: 10 })}>delayAdd</button>
-            <button onClick={ev => dispatch({ ...state, auto: !state.auto })} class={{ auto: state.auto }}>auto:{state.auto ? 'true' : 'false'}</button>
-            <button onClick={ev => dispatch([state, HttpText.create(OnTextResponse, new URL('/', document.baseURI).href)])}>http requst</button>
+            <button onClick={ev => dispatch({ ...state, auto: !state.auto })}>auto:{state.auto ? 'true' : 'false'}</button>
+            <button onClick={ev => dispatch([state, HttpText.create(OnTextResponse, '/')])}>http requst</button>
+            <button onClick={ev => dispatch({ ...state, text: '' })}>clear text</button>
+
             <div style={{ fontSize: '20px' }}>value: {state.value}</div>
             <div>text: {state.text}</div>
             <div>
