@@ -22,6 +22,12 @@ const AddWithDelay: Action<State, { duration: number, amount: number }> = (state
 ]
 
 
+const ToggleAuto: Action<State> = state => ({
+    ...state,
+    auto: !state.auto,
+})
+
+
 const Input: Action<State, string> = (state, value) => ({ ...state, input: value })
 
 const OnTextResponse = HttpText.createAction<State>((state, params) => ({
@@ -66,7 +72,7 @@ app({
             <button onClick={ev => dispatch(Increment)}>increment</button>
             <button onClick={ev => dispatch(Add, { amount: 10 })}>add10</button>
             <button onClick={ev => dispatch(AddWithDelay, { duration: 1000, amount: 10 })}>delayAdd</button>
-            <button onClick={ev => dispatch({ ...state, auto: !state.auto })}>auto:{state.auto ? 'true' : 'false'}</button>
+            <button onClick={ev => dispatch(ToggleAuto)}>auto:{state.auto ? 'true' : 'false'}</button>
             <button onClick={ev => dispatch([state, HttpText.create(OnTextResponse, '/')])}>http requst</button>
             <button onClick={ev => dispatch({ ...state, text: '' })}>clear text</button>
 
