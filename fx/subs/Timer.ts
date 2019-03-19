@@ -1,9 +1,8 @@
 import { Subscription } from 'typerapp'
 
-export const Timer = new Subscription<{ interval: number }, { count: number }>((props, dispatch) => {
-    let count = 0;
+export const Timer = new Subscription<{ interval: number }, {}>((props, dispatch) => {
     const id = setInterval(
-        () => dispatch(props.action[0], { ...props.action[1], count: ++count, }),
+        () => dispatch(props.action[0], props.action[1]),
         props.interval
     )
     return () => clearInterval(id)

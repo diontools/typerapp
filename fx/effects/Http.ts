@@ -1,6 +1,8 @@
 import { Effect } from 'typerapp'
 
-export const Http = new Effect<string | [string, RequestInit], { response: Response }, { req: string | [string, RequestInit] }>(
+export type HttpProps = string | [string, RequestInit]
+
+export const Http = new Effect<HttpProps, { response: Response }, { req: HttpProps }>(
     (props, dispatch) => {
         (Array.isArray(props.req)
             ? fetch(props.req[0], props.req[1])
@@ -12,7 +14,7 @@ export const Http = new Effect<string | [string, RequestInit], { response: Respo
     (action, props, runner) => [runner, { action, req: props }]
 )
 
-export const HttpText = new Effect<string | [string, RequestInit], { text: string }, { req: string | [string, RequestInit] }>(
+export const HttpText = new Effect<HttpProps, { text: string }, { req: HttpProps }>(
     (props, dispatch) => {
         (Array.isArray(props.req)
             ? fetch(props.req[0], props.req[1])

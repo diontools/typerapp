@@ -16,29 +16,10 @@ const Add: Action<State, { amount: number }> = (state, params) => ({
 })
 
 
-
-const OnDelayed = Delay.createAction<State, { amount: number }>((state, params) => ({
-    ...state,
-    value: state.value + params.amount,
-    text: params.startTime,
-}))
-
-const DelayAdd: Action<State, { interval: number, amount: number }> = (state, params) => [
+const AddWithDelay: Action<State, { duration: number, amount: number }> = (state, params) => [
     state,
-    Delay.create([OnDelayed, { amount: params.amount }], { duration: params.interval }),
+    Delay.create([Add, { amount: params.amount }], { duration: params.duration }),
 ]
-
-
-const OnTimer = Timer.createAction<State>((state, params) => ({
-    ...state,
-    value: state.value + 1,
-    count: params.count,
-}))
-
-const ToggleTimer: Action<State> = state => ({
-    ...state,
-    auto: !state.auto,
-})
 
 
 const Input: Action<State, string> = (state, value) => ({ ...state, input: value })
@@ -85,12 +66,11 @@ app({
 
             <button onClick={ev => dispatch(Increment)}>increment</button>
             <button onClick={ev => dispatch(Add, { amount: 10 })}>add10</button>
-            <button onClick={ev => dispatch(DelayAdd, { interval: 1000, amount: 10 })}>delayAdd</button>
-            <button onClick={ev => dispatch(ToggleTimer)} class={{ auto: state.auto }}>auto:{state.auto ? 'true' : 'false'}</button>
-            <button onClick={ev => dispatch([state, HttpText.create(OnTextResponse, ['/', { method: 'GET', window }])])}>http requst</button>
+            <button onClick={ev => dispatch(AddWithDelay, { duration: 1000, amount: 10 })}>delayAdd</button>
+            <button onClick={ev => dispatch({ ...state, auto: !state.auto })} class={{ auto: state.auto }}>auto:{state.auto ? 'true' : 'false'}</button>
+            <button onClick={ev => dispatch([state, HttpText.create(OnTextResponse, new URL('/', document.baseURI).href)])}>http requst</button>
             <div style={{ fontSize: '20px' }}>value: {state.value}</div>
             <div>text: {state.text}</div>
-            <div>count: {state.count}</div>
             <div>
                 <label htmlFor="input">input:</label>
                 <input id="input" type="text" value={state.input} onInput={ev => dispatch(Input, ev.currentTarget.value)} /> → {state.input}
@@ -111,6 +91,6 @@ app({
             </div>
         </div>
     ),
-    subscriptions: state => [state.auto && Timer.create(OnTimer, { interval: 500 })],
+    subscriptions: state => [state.auto && Timer.create([Add, { amount: 1 }], { interval: 500 })],
     container: document.body,
 })
