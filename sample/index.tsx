@@ -48,11 +48,6 @@ const OnTextResponse = HttpText.createAction<State>((state, params) => ({
     text: params.text
 }))
 
-const Request: Action<State> = state => [
-    state,
-    HttpText.create([OnTextResponse, undefined], ['./', { method: 'GET' }])
-]
-
 const lazyView = (p: { auto: State['auto'] }) => (
     <div>
         auto update: {new Date().toISOString()}
@@ -92,8 +87,7 @@ app({
             <button onClick={ev => dispatch(Add, { amount: 10 })}>add10</button>
             <button onClick={ev => dispatch(DelayAdd, { interval: 1000, amount: 10 })}>delayAdd</button>
             <button onClick={ev => dispatch(ToggleTimer)} class={{ auto: state.auto }}>auto:{state.auto ? 'true' : 'false'}</button>
-            <button onClick={ev => dispatch(Request)}>http requst</button>
-            <button onClick={ev => dispatch([state, HttpText.create([OnTextResponse, undefined], ['./', { method: 'GET' }])])}>http requst2</button>
+            <button onClick={ev => dispatch([state, HttpText.create(OnTextResponse, ['/', { method: 'GET', window }])])}>http requst</button>
             <div style={{ fontSize: '20px' }}>value: {state.value}</div>
             <div>text: {state.text}</div>
             <div>count: {state.count}</div>
@@ -117,6 +111,6 @@ app({
             </div>
         </div>
     ),
-    subscriptions: state => [state.auto && Timer.create([OnTimer, undefined], { interval: 500 })],
+    subscriptions: state => [state.auto && Timer.create(OnTimer, { interval: 500 })],
     container: document.body,
 })

@@ -590,8 +590,10 @@ export class Effect<Props, ReturnProps = {}, RunnerProps = Props> {
             runner: EffectRunner<RunnerProps, ReturnProps>) => EffectObject<RunnerProps, ReturnProps>) {
     }
 
-    create<S, P>(action: EffectAction<S, P, ReturnProps>, props: Props) {
-        return this.creator(action, props, this.runner)
+    create<S>(action: Action<S, undefined & ReturnProps>, props: Props): EffectObject<RunnerProps, ReturnProps>
+    create<S, P>(action: EffectAction<S, P, ReturnProps>, props: Props): EffectObject<RunnerProps, ReturnProps>
+    create<S, P>(action: Action<S, P & ReturnProps> | EffectAction<S, P, ReturnProps>, props: Props) {
+        return this.creator(isArray(action) ? action : [action, {} as P & ReturnProps], props, this.runner)
     }
 
     createAction<S, P = undefined>(action: Action<S, P & ReturnProps>): Action<S, P & ReturnProps> {
@@ -615,8 +617,10 @@ export class Subscription<Props, ReturnProps = {}, RunnerProps = Props>{
             runner: SubscriptionRunner<Props, ReturnProps>) => SubscriptionObject<RunnerProps, ReturnProps>) {
     }
 
-    create<S, P>(action: EffectAction<S, P, ReturnProps>, props: Props) {
-        return this.creator(action, props, this.runner)
+    create<S>(action: Action<S, undefined & ReturnProps>, props: Props): SubscriptionObject<RunnerProps, ReturnProps>
+    create<S, P>(action: EffectAction<S, P, ReturnProps>, props: Props): SubscriptionObject<RunnerProps, ReturnProps>
+    create<S, P>(action: Action<S, P & ReturnProps> | EffectAction<S, P, ReturnProps>, props: Props) {
+        return this.creator(isArray(action) ? action : [action, {} as P & ReturnProps], props, this.runner)
     }
 
     createAction<S, P = undefined>(action: Action<S, P & ReturnProps>): Action<S, P & ReturnProps> {
@@ -632,6 +636,7 @@ export type SubscriptionsResult =
 export type Dispatch<S> = {
     <P>(action: Action<S, P>, params: P): void
     (action: Action<S, undefined>): void
+    <P>(actionWithParams: [Action<S, P>, P]): void
     (result: ActionResult<S>): void
 }
 
