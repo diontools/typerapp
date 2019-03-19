@@ -59,7 +59,7 @@ export type Style =
     CSS.Properties<string | number>
     | { [key: string]: CSS.Properties<string | number> }
 
-export default function <P = any, K extends keyof HTMLElementTagNameMap = 'div'>(nodeName: K) {
+export function style<P = any, K extends keyof HTMLElementTagNameMap = 'div'>(nodeName: K) {
     var cache: { [key: string]: string } = {}
     return function (decls: ((props: P) => Style) | Style) {
         return function (props?: P, children?: VNode[]) {

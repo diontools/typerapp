@@ -1,6 +1,6 @@
 import { h, app, Action, Lazy } from 'typerapp'
 import { Helmet } from 'typerapp/helmet'
-import style from 'typerapp/style'
+import { style } from 'typerapp/style'
 import { Delay, Timer, HttpText } from 'typerapp/fx';
 import { State, initState } from './states'
 import * as part from './part'
