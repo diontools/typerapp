@@ -36,6 +36,7 @@ const config: webpack.Configuration = {
     contentBase: distDir,
     compress: true,
     port: 9000,
+    historyApiFallback: true,
   }
 }
 
