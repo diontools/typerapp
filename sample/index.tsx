@@ -70,7 +70,7 @@ const StyledText = style<{ color: string }>('div')(props => ({
     color: props.color,
     transition: "transform .2s ease-out",
     ":hover": {
-        transform: "scale(1.2)",
+        transform: "scale(1.5)",
     },
     "@media (orientation: landscape)": {
         fontWeight: "bold",
