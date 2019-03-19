@@ -59,15 +59,15 @@ export type Style =
     CSS.Properties<string | number>
     | { [key: string]: CSS.Properties<string | number> }
 
-export default function <K extends keyof HTMLElementTagNameMap>(nodeName: K) {
+export default function <P = any, K extends keyof HTMLElementTagNameMap = 'div'>(nodeName: K) {
     var cache: { [key: string]: string } = {}
-    return function (decls: ((props: any) => Style) | Style) {
-        return function (props?: any, children?: VNode[]) {
-            props = isEmpty(props) ? {} : props
+    return function (decls: ((props: P) => Style) | Style) {
+        return function (props?: P, children?: VNode[]) {
+            props = isEmpty(props) ? {} as P : props!
             var nodeDecls = typeof decls == "function" ? decls(props) : decls
             var key = JSON.stringify(nodeDecls)
-            cache[key] || (cache[key] = createStyle(nodeDecls))
-            props.class = [cache[key], props.class].filter(Boolean).join(" ")
+            cache[key] || (cache[key] = createStyle(nodeDecls));
+            (props as any).class = [cache[key], (props as any).class].filter(Boolean).join(" ")
             return h(nodeName, props, children)
         }
     }

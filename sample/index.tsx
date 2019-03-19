@@ -71,8 +71,8 @@ const Wrapper = style('div')({
     width: '50px',
 })
 
-const StyledText = style('div')({
-    color: "green",
+const StyledText = style<{ color: string }>('div')(props => ({
+    color: props.color,
     transition: "transform .2s ease-out",
     ":hover": {
         transform: "scale(1.2)",
@@ -80,7 +80,7 @@ const StyledText = style('div')({
     "@media (orientation: landscape)": {
         fontWeight: "bold",
     },
-})
+}))
 
 app({
     init: () => initState,
@@ -108,7 +108,7 @@ app({
                 {Lazy({ key: 'lazy', render: lazyView, auto: state.auto })}
             </div>
             <Wrapper>
-                <StyledText>abc</StyledText>
+                <StyledText color='green'>abc</StyledText>
             </Wrapper>
             <div>
                 <svg viewBox="0 0 52.916666 52.916666" width={100}>
