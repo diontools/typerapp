@@ -86,7 +86,7 @@ app({
                 {part.view(state, dispatch)}
             </div>
             <div class={'lazy-view'}>
-                {Lazy({ key: 'lazy', render: lazyView, auto: state.auto })}
+                <Lazy key='lazy' render={lazyView} auto={state.auto} />
             </div>
             <Wrapper>
                 <StyledText color='green'>abc</StyledText>
