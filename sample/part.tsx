@@ -1,11 +1,11 @@
-import { h, Action, View, mergeState } from 'typerapp'
+import { h, Action, View } from 'typerapp'
 import { Delay } from 'typerapp/fx';
 import { State } from './states'
 
-const DelayedCountUp = Delay.createAction<State>(state => mergeState(state, 'part', s => ({ ...s, p: s.p + 1 })))
+const DelayedCountUp = Delay.createAction<State>(state => ({ ...state, part: { p: state.part.p + 1 } }))
 
 const Add: Action<State, { amount: number }> = (state, params) => [
-    mergeState(state, 'part', s => ({ ...s, p: s.p + params.amount })),
+    { ...state, part: { p: state.part.p + params.amount } },
     Delay.create(DelayedCountUp, { duration: 200 })
 ]
 

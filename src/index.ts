@@ -683,10 +683,3 @@ export interface ClassObject {
 export interface ClassArray extends Array<Class> { }
 
 export type Class = string | number | ClassObject | ClassArray
-
-export function mergeState<S, N extends keyof S>(state: S, key: N, value: (v: S[N]) => S[N]): S {
-    return {
-        ...state,
-        [key]: value(state[key]),
-    }
-}
