@@ -584,8 +584,10 @@ export type EffectObject<RunnerProps, ReturnProps> = [EffectRunner<RunnerProps, 
 export class Effect<Props, ReturnProps = {}, RunnerProps = Props> {
     public constructor(
         private runner: EffectRunner<RunnerProps, ReturnProps>,
-        private creator: <S, P>(action: EffectAction<S, P, ReturnProps>, props: Props, runner: EffectRunner<RunnerProps, ReturnProps>) =>
-            EffectObject<RunnerProps, ReturnProps>) {
+        private creator: <S, P>(
+            action: EffectAction<S, P, ReturnProps>,
+            props: Props,
+            runner: EffectRunner<RunnerProps, ReturnProps>) => EffectObject<RunnerProps, ReturnProps>) {
     }
 
     create<S, P>(action: EffectAction<S, P, ReturnProps>, props: Props) {
@@ -607,8 +609,10 @@ export type SubscriptionObject<RunnerProps, ReturnProps> = [SubscriptionRunner<R
 export class Subscription<Props, ReturnProps = {}, RunnerProps = Props>{
     public constructor(
         private runner: SubscriptionRunner<Props, ReturnProps>,
-        private creator: <S, P>(action: EffectAction<S, P, ReturnProps>, props: Props, runner: SubscriptionRunner<Props, ReturnProps>) =>
-            SubscriptionObject<RunnerProps, ReturnProps>) {
+        private creator: <S, P>(
+            action: EffectAction<S, P, ReturnProps>,
+            props: Props,
+            runner: SubscriptionRunner<Props, ReturnProps>) => SubscriptionObject<RunnerProps, ReturnProps>) {
     }
 
     create<S, P>(action: EffectAction<S, P, ReturnProps>, props: Props) {
