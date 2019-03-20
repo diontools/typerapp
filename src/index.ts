@@ -491,7 +491,7 @@ export var app = function <S>(props: AppProps<S>) {
         }
     }
 
-    dispatch(props.init)
+    dispatch(<S>props.init)
 }
 
 type EventCb = (ev: Event) => void
@@ -571,7 +571,7 @@ export type Dispatch<S> = {
 export type View<S> = (state: S, dispatch: Dispatch<S>) => VNode
 
 export type AppProps<S> = {
-    init: Action<S>,
+    init: Action<S> | ActionResult<S>,
     view?: View<S>,
     subscriptions?: (state: S) => SubscriptionsResult,
     container: Element

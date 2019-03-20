@@ -3,7 +3,7 @@ import { Helmet } from 'typerapp/helmet'
 import { style } from 'typerapp/style'
 import { Delay, Timer, HttpText } from 'typerapp/fx';
 import { createRouter, Link, Route } from 'typerapp/router'
-import { State, initState, RouteProps } from './states'
+import { State, RouteProps } from './states'
 import * as part from './part'
 
 const Increment: Action<State> = state => ({
@@ -82,8 +82,17 @@ const router = createRouter<State, RouteProps>({
     matched: (route, dispatch) => dispatch(SetRoute, route),
 })
 
-app({
-    init: () => initState,
+app<State>({
+    init: {
+        value: 1,
+        text: '',
+        auto: false,
+        input: '',
+        part: {
+            p: 0,
+        },
+        route: undefined,
+    },
     view: (state, dispatch) => (
         <div>
             <Lazy key="head" render={renderHead} title={state.route ? state.route.title : '404'} />
