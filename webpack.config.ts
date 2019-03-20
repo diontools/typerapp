@@ -5,6 +5,7 @@ const webpack = require('webpack')
 const path = require('path')
 const { TsconfigPathsPlugin } = require('tsconfig-paths-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const HtmlWebpackInlineSourcePlugin = require('html-webpack-inline-source-plugin')
 
 const distDir = path.resolve(__dirname, 'sample-dist')
 
@@ -33,7 +34,11 @@ const config: Configuration = {
     plugins: [new TsconfigPathsPlugin({ configFile: './sample/tsconfig.json' })],
   },
   plugins: [
-    new HtmlWebpackPlugin({ template: './sample/index.html' }),
+    new HtmlWebpackPlugin({
+      template: './sample/index.html',
+      inlineSource: '.(js|css)$', // embed all javascript and css inline
+    }),
+    new HtmlWebpackInlineSourcePlugin(),
   ],
   devServer: {
     contentBase: distDir,
