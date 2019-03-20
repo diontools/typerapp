@@ -1,11 +1,14 @@
-import * as webpack from 'webpack'
-import * as path from 'path'
-import { TsconfigPathsPlugin } from 'tsconfig-paths-webpack-plugin'
-import * as HtmlWebpackPlugin from 'html-webpack-plugin'
+import { Configuration } from "webpack";
+
+//import * as webpack from 'webpack'
+const webpack = require('webpack')
+const path = require('path')
+const { TsconfigPathsPlugin } = require('tsconfig-paths-webpack-plugin')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 const distDir = path.resolve(__dirname, 'sample-dist')
 
-const config: webpack.Configuration = {
+const config: Configuration = {
   entry: './sample/index.tsx',
   devtool: 'source-map',
   output: {
