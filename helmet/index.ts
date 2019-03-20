@@ -1,6 +1,6 @@
 import { h, VNode, VNodeType, convName } from '..'
 
-function debug(...args: any[]) {
+function debug(args: any[]) {
     //console.log(...args)
 }
 
@@ -38,16 +38,16 @@ function updateElement(vNode: VNode, element: Element) {
             const attr = element.getAttributeNode(name)
             if (attr) {
                 if (value !== attr.value) {
-                    debug('update', vNode, name, value)
+                    debug(['update', vNode, name, value])
                     attr.value = value
                 }
             } else {
-                debug('create attr', vNode, name, value)
+                debug(['create attr', vNode, name, value])
                 element.setAttribute(name, value)
             }
             usedNames.push(name)
         } else {
-            debug('remove attr', vNode, name)
+            debug(['remove attr', vNode, name])
             element.removeAttribute(name)
         }
     }
@@ -57,7 +57,7 @@ function updateElement(vNode: VNode, element: Element) {
         if (attr.name === id || usedNames.indexOf(attr.name) >= 0) {
             i++
         } else {
-            debug('remove attr', element, name)
+            debug(['remove attr', element, name])
             element.removeAttributeNode(attr)
         }
     }
@@ -77,12 +77,12 @@ function updateNodes(children: VNode[], parentNode: Node, isChild: boolean) {
                 if (vNode.type === VNodeType.TEXT) {
                     // update text
                     if (vNode.name !== childText.textContent) {
-                        debug('update text', vNode)
+                        debug(['update text', vNode])
                         childText.textContent = vNode.name
                     }
                 } else {
                     // replace
-                    debug('replace', i, vNode)
+                    debug(['replace', i, vNode])
                     parentNode.replaceChild(createElement(vNode), childNode)
                 }
             } else {
@@ -92,20 +92,20 @@ function updateNodes(children: VNode[], parentNode: Node, isChild: boolean) {
                     updateElement(vNode, childElement)
                 } else {
                     // replace
-                    debug('replace', i, vNode)
+                    debug(['replace', i, vNode])
                     parentNode.replaceChild(createElement(vNode), childElement)
                 }
             }
         } else {
             // add
-            debug('add', i, vNode)
+            debug(['add', i, vNode])
             parentNode.appendChild(createElement(vNode))
         }
     }
 
     // clean up
     for (let i = children.length; i < childNodes.length; i++) {
-        debug('remove', i, childNodes[i])
+        debug(['remove', i, childNodes[i]])
         parentNode.removeChild(childNodes[i])
     }
 }

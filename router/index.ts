@@ -1,7 +1,7 @@
 import { h, Dispatch, VNode, Subscription, Effect, Action } from '..'
 
-function debug(...args: any[]) {
-    console.log(...args)
+function debug(args: any[]) {
+    //console.log(...args)
 }
 
 export interface RouterProps<S, P> {
@@ -19,11 +19,12 @@ export type Route<S, P> = {
 export function createRouter<S, P>(props: RouterProps<S, P>) {
     const subs = new Subscription<RouterProps<S, P>>(
         (props, dispatch) => {
-            debug('routing')
+            debug(['routing'])
             function onLocationChanged() {
-                debug(window.location.pathname)
+                const pathname = window.location.pathname
+                debug([pathname])
                 for (const r of props.routes) {
-                    if (r.path === window.location.pathname) {
+                    if (r.path === pathname) {
                         props.matched(r, dispatch as any)
                         return
                     }
@@ -46,7 +47,7 @@ export function createRouter<S, P>(props: RouterProps<S, P>) {
             onLocationChanged()
 
             return () => {
-                debug('unrouting')
+                debug(['unrouting'])
                 window.history.pushState = push
                 window.history.replaceState = replace
                 window.removeEventListener("popstate", onLocationChanged)
