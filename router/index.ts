@@ -1,5 +1,9 @@
 import { h, Dispatch, VNode, Subscription, Effect, Action } from '..'
 
+function debug(...args: any[]) {
+    console.log(...args)
+}
+
 export interface RouterProps<S, P> {
     routes: Route<S, P>[],
     matched: (route: Route<S, P> | undefined, dispatch: Dispatch<S>) => void,
@@ -15,9 +19,9 @@ export type Route<S, P> = {
 export function createRouter<S, P>(props: RouterProps<S, P>) {
     const subs = new Subscription<RouterProps<S, P>>(
         (props, dispatch) => {
-            console.log('routing')
+            debug('routing')
             function onLocationChanged() {
-                console.log(window.location.pathname)
+                debug(window.location.pathname)
                 for (const r of props.routes) {
                     if (r.path === window.location.pathname) {
                         props.matched(r, dispatch as any)
@@ -42,7 +46,7 @@ export function createRouter<S, P>(props: RouterProps<S, P>) {
             onLocationChanged()
 
             return () => {
-                console.log('unrouting')
+                debug('unrouting')
                 window.history.pushState = push
                 window.history.replaceState = replace
                 window.removeEventListener("popstate", onLocationChanged)
@@ -54,7 +58,7 @@ export function createRouter<S, P>(props: RouterProps<S, P>) {
     return subs.create(undefined as any, props)
 }
 
-export const pushHistory = new Effect<{ to: string }>(
+export const PushHistory = new Effect<{ to: string }>(
     (props, dispatch) => window.history.pushState(null, '', props.to),
     (action, props, runner) => [runner, { action, ...props }]
 )
@@ -73,5 +77,5 @@ export function Link<S>(props: LinkProps<S>, children: any) {
 
 export const MoveTo: Action<any, { to: string, ev: Event }> = (state, params) => {
     params.ev.preventDefault()
-    return [state, pushHistory.create(undefined as any, params)]
+    return [state, PushHistory.create(undefined as any, params)]
 }
