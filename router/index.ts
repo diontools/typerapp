@@ -110,19 +110,30 @@ function matchPath(path: string, segs: PathSeg[]): RouteParams | undefined {
     return p === path.length ? result || {} : undefined
 }
 
+function pushHistory(to: string) {
+    window.history.pushState(null, '', to)
+}
+
 export const PushHistory = new Effect<{ to: string }>(
-    (props, dispatch) => window.history.pushState(null, '', props.to),
+    (props, dispatch) => pushHistory(props.to),
     (action, props, runner) => [runner, { action, ...props }]
 )
 
 export interface LinkProps<S> {
     to: string
-    dispatch: Dispatch<S>
+    dispatch?: Dispatch<S>
 }
 
 export function Link<S>(props: LinkProps<S>, children: any) {
     return h('a', {
-        onClick: (ev: Event) => props.dispatch(MoveTo, { to: props.to, ev }),
+        onClick: (ev: Event) => {
+            if (props.dispatch) {
+                props.dispatch(MoveTo, { to: props.to, ev })
+            } else {
+                ev.preventDefault()
+                pushHistory(props.to)
+            }
+        },
         href: props.to
     }, children)
 }
