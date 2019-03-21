@@ -2,7 +2,7 @@ import { h, app, Action, Lazy } from 'typerapp'
 import { Helmet } from 'typerapp/helmet'
 import { style } from 'typerapp/style'
 import { Delay, Timer, HttpText } from 'typerapp/fx';
-import { createRouter, Link, Route } from 'typerapp/router'
+import { createRouter, Link, Route, RoutingInfo } from 'typerapp/router'
 import { State, RouteProps } from './states'
 import * as part from './part'
 
@@ -64,22 +64,34 @@ const StyledText = style<{ color: string }>('div')(props => ({
     },
 }))
 
-const SetRoute: Action<State, Route<State, RouteProps> | undefined> = (state, route) => ({
+const SetRoute: Action<State, RoutingInfo<State, RouteProps> | undefined> = (state, route) => ({
     ...state,
-    route,
+    routing: route,
 })
 
 const router = createRouter<State, RouteProps>({
     routes: [{
-        title: 'HOME',
+        title: (state, params) => 'HOME',
         path: '/',
-        view: (state, dispatch) => <div>home</div>,
+        view: (state, dispatch, params) => <div>home</div>,
     }, {
-        title: 'PAGE1',
-        path: '/page1',
-        view: (state, dispatch) => <div>page1</div>,
+        title: (state, params) => 'PAGE',
+        path: '/page',
+        view: (state, dispatch, params) => <div>page</div>,
+    }, {
+        title: (state, params) => 'PAGE / ' + params.id,
+        path: '/page/:id',
+        view: (state, dispatch, params) => <div>page:{params.id}</div>
+    }, {
+        title: (state, params) => 'PAGE / ' + params.id + ' / ' + params.extra,
+        path: '/page/:id/:extra',
+        view: (state, dispatch, params) => <div>page:{params.id} extra:{params.extra}</div>
+    }, {
+        title: (state, params) => params.id,
+        path: '/:id',
+        view: (state, dispatch, params) => <div>id:{params.id}</div>
     }],
-    matched: (route, dispatch) => dispatch(SetRoute, route),
+    matched: (routing, dispatch) => dispatch(SetRoute, routing),
 })
 
 app<State>({
@@ -91,11 +103,11 @@ app<State>({
         part: {
             p: 0,
         },
-        route: undefined,
+        routing: undefined,
     },
     view: (state, dispatch) => (
         <div>
-            <Lazy key="head" render={renderHead} title={state.route ? state.route.title : '404'} />
+            <Lazy key="head" render={renderHead} title={state.routing ? state.routing.route.title(state, state.routing.params) : '404'} />
 
             <button onClick={ev => dispatch(Increment)}>increment</button>
             <button onClick={ev => dispatch(Add, { amount: 10 })}>add10</button>
@@ -127,10 +139,12 @@ app<State>({
             <div>
                 <ul>
                     <li><Link to="/" dispatch={dispatch}>home</Link></li>
-                    <li><Link to="/page1" dispatch={dispatch}>page1</Link></li>
+                    <li><Link to="/page" dispatch={dispatch}>page</Link></li>
+                    <li><Link to="/page/test" dispatch={dispatch}>page/test</Link></li>
+                    <li><Link to="/page/test/value" dispatch={dispatch}>page/test/value</Link></li>
                     <li><Link to="/unknown" dispatch={dispatch}>unknown</Link></li>
                 </ul>
-                {state.route ? state.route.view(state, dispatch) : <div>404</div>}
+                {state.routing ? state.routing.route.view(state, dispatch, state.routing.params) : <div>404</div>}
             </div>
         </div>
     ),

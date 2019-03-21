@@ -1,7 +1,7 @@
-import { Route } from 'typerapp/router'
+import { RoutingInfo, RouteParams } from 'typerapp/router'
 
 export type RouteProps = {
-    title: string
+    title: (state: State, params: RouteParams) => string
 }
 
 export type State = {
@@ -12,5 +12,5 @@ export type State = {
     part: {
         p: number,
     },
-    route?: Route<State, RouteProps>,
+    routing?: RoutingInfo<State, RouteProps>,
 }

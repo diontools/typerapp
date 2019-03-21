@@ -6,14 +6,26 @@ function debug(args: any[]) {
 
 export interface RouterProps<S, P> {
     routes: Route<S, P>[],
-    matched: (route: Route<S, P> | undefined, dispatch: Dispatch<S>) => void,
+    matched: (routing: RoutingInfo<S, P> | undefined, dispatch: Dispatch<S>) => void,
+}
+
+export type PathSeg = string | {
+    id: string
 }
 
 export type Route<S, P> = {
     path: string
-    view: (state: S, dispatch: Dispatch<S>) => VNode
+    view: (state: S, dispatch: Dispatch<S>, params: RouteParams) => VNode
+    _pathSegs?: PathSeg[]
 } & {
-    [N in keyof P]: P[N]
+        [N in keyof P]: P[N]
+    }
+
+export type RouteParams = { [key: string]: string }
+
+export type RoutingInfo<S, P> = {
+    route: Route<S, P>
+    params: RouteParams
 }
 
 export function createRouter<S, P>(props: RouterProps<S, P>) {
@@ -23,9 +35,11 @@ export function createRouter<S, P>(props: RouterProps<S, P>) {
             function onLocationChanged() {
                 const pathname = window.location.pathname
                 debug([pathname])
-                for (const r of props.routes) {
-                    if (r.path === pathname) {
-                        props.matched(r, dispatch as any)
+                for (const route of props.routes) {
+                    route._pathSegs = route._pathSegs || splitPath(route.path)
+                    const params = matchPath(pathname, route._pathSegs)
+                    if (params) {
+                        props.matched({ route, params }, dispatch as any)
                         return
                     }
                 }
@@ -57,6 +71,43 @@ export function createRouter<S, P>(props: RouterProps<S, P>) {
     )
 
     return subs.create(undefined as any, props)
+}
+
+function splitPath(path: string): PathSeg[] {
+    return path
+        .split('/')
+        .filter(s => s != "")
+        .map(s => s[0] === ':' ? { id: s.slice(1) } : s)
+}
+
+function matchPath(path: string, segs: PathSeg[]): RouteParams | undefined {
+    if (segs.length === 0) return path === '/' ? {} : undefined
+
+    let result: RouteParams | undefined = undefined
+    let p = 1 // position
+
+    for (let segIndex = 0; segIndex < segs.length; segIndex++) {
+        const seg = segs[segIndex]
+        if (typeof seg === "string") {
+            if (path.length < p + seg.length) return // out of range
+            for (let i = 0; i < seg.length; i++) {
+                if (path[p + i] !== seg[i]) return
+            }
+            p += seg.length
+            if (p < path.length && path[p++] !== '/') return // not matching string
+        } else {
+            const start = p
+            for (; ; p++) {
+                if (p + 1 === path.length || path[p + 1] === '/') {
+                    (result = result || {})[seg.id] = path.slice(start, ++p)
+                    break
+                }
+            }
+            if (p < path.length) p++ // skip '/'
+        }
+    }
+
+    return p === path.length ? result || {} : undefined
 }
 
 export const PushHistory = new Effect<{ to: string }>(
