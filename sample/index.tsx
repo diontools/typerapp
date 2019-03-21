@@ -144,19 +144,18 @@ app<State>({
         <div>
             <Lazy key="head" render={renderHead} title={state.routing ? state.routing.route.title(state, state.routing.params) : '404'} />
 
-            <div>
-                <ul>
-                    <li><Link to="/">home</Link></li>
-                    <li><Link to="/counter">Counter</Link></li>
-                    <li><Link to="/counter/10">Counter/10</Link></li>
-                    <li><Link to="/counter/test/value">Counter/test/value</Link></li>
-                    <li><Link to="/fetch">Fetch</Link></li>
-                    <li><Link to="/input">Input</Link></li>
-                    <li><Link to="/sub">Sub</Link></li>
-                    <li><Link to="/unknown">unknown</Link></li>
-                </ul>
-                {state.routing ? state.routing.route.view(state, dispatch, state.routing.params) : <div>404</div>}
-            </div>
+            <ul>
+                <li><Link to="/">home</Link></li>
+                <li><Link to="/counter">Counter</Link></li>
+                <li><Link to="/counter/10">Counter/10</Link></li>
+                <li><Link to="/counter/test/value">Counter/test/value</Link></li>
+                <li><Link to="/fetch">Fetch</Link></li>
+                <li><Link to="/input">Input</Link></li>
+                <li><Link to="/style">Style</Link></li>
+                <li><Link to="/sub">Sub</Link></li>
+                <li><Link to="/unknown">unknown</Link></li>
+            </ul>
+            {state.routing ? state.routing.route.view(state, dispatch, state.routing.params) : <div>404</div>}
         </div>
     ),
     subscriptions: state => [
