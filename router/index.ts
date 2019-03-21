@@ -121,6 +121,7 @@ export const PushHistory = new Effect<{ to: string }>(
 
 export interface LinkProps<S> {
     to: string
+    activeClassName?: string
     dispatch?: Dispatch<S>
 }
 
@@ -134,7 +135,8 @@ export function Link<S>(props: LinkProps<S>, children: any) {
                 pushHistory(props.to)
             }
         },
-        href: props.to
+        href: props.to,
+        class: location.pathname === props.to ? props.activeClassName || 'active' : undefined,
     }, children)
 }
 

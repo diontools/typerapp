@@ -40,7 +40,7 @@ const lazyView = (p: { auto: State['auto'] }) => (
 const renderHead = (props: { title: string }) => <Helmet>
     <title>Typerapp - {props.title}</title>
     <meta httpEquiv="content-language" content="ja" />
-    <style>{'.auto{font-weight:bold}'}</style>
+    <style>{'.auto,.active{font-weight:bold}'}</style>
 </Helmet>
 
 const Wrapper = style('div')({
