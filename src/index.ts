@@ -63,7 +63,7 @@ var shouldRestart = function (a: any, b: any) {
     }
 }
 
-var patchSub = function (sub: any, newSub: any, dispatch: any) {
+var patchSub = function (sub: any[], newSub: any[], dispatch: any) {
     for (var i = 0, a, b, out = []; i < sub.length || i < newSub.length; i++) {
         a = sub[i]
         out.push(
