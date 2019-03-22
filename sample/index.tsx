@@ -2,7 +2,7 @@ import { h, app, Action, Lazy, Dispatch } from 'typerapp'
 import { Helmet } from 'typerapp/helmet'
 import { style } from 'typerapp/style'
 import { Delay, Timer, HttpText } from 'typerapp/fx';
-import { createRouter, Link, Route, RoutingInfo } from 'typerapp/router'
+import { createRouter, Link, Route, RoutingInfo, Redirect } from 'typerapp/router'
 import { State, RouteProps } from './states'
 import * as part from './part'
 
@@ -125,6 +125,10 @@ const router = createRouter<State, RouteProps>({
         title: (state, params) => 'Sub!',
         path: '/sub',
         view: (state, dispatch, params) => part.view(state, dispatch),
+    }, {
+        title: (state, params) => 'Redirect!',
+        path: '/redirect',
+        view: (state, dispatch, params) => <Redirect to="/" />,
     }],
     matched: (routing, dispatch) => dispatch(SetRoute, routing),
 })
@@ -153,6 +157,7 @@ app<State>({
                 <li><Link to="/input">Input</Link></li>
                 <li><Link to="/style">Style</Link></li>
                 <li><Link to="/sub">Sub</Link></li>
+                <li><Link to="/redirect">Redirect</Link></li>
                 <li><Link to="/unknown">unknown</Link></li>
             </ul>
             {state.routing ? state.routing.route.view(state, dispatch, state.routing.params) : <div>404</div>}

@@ -114,13 +114,23 @@ function pushHistory(to: string) {
     window.history.pushState(null, '', to)
 }
 
+function replaceHistory(to: string) {
+    window.history.replaceState(null, '', to)
+}
+
 export const PushHistory = new Effect<{ to: string }>(
     (props, dispatch) => pushHistory(props.to),
     (action, props, runner) => [runner, { action, ...props }]
 )
 
+export const ReplaceHistory = new Effect<{ to: string }>(
+    (props, dispatch) => replaceHistory(props.to),
+    (action, props, runner) => [runner, { action, ...props }]
+)
+
 export interface LinkProps<S> {
     to: string
+    replace?: boolean
     activeClassName?: string
     dispatch?: Dispatch<S>
 }
@@ -129,10 +139,10 @@ export function Link<S>(props: LinkProps<S>, children: any) {
     return h('a', {
         onClick: (ev: Event) => {
             if (props.dispatch) {
-                props.dispatch(MoveTo, { to: props.to, ev })
+                props.dispatch(MoveTo, { to: props.to, replace: props.replace, ev })
             } else {
                 ev.preventDefault()
-                pushHistory(props.to)
+                props.replace ? replaceHistory(props.to) : pushHistory(props.to)
             }
         },
         href: props.to,
@@ -140,7 +150,22 @@ export function Link<S>(props: LinkProps<S>, children: any) {
     }, children)
 }
 
-export const MoveTo: Action<any, { to: string, ev: Event }> = (state, params) => {
-    params.ev.preventDefault()
-    return [state, PushHistory.create(undefined as any, params)]
+export interface RedirectProps<S> {
+    to: string
+    push?: boolean
+    dispatch?: Dispatch<S>
+}
+
+export function Redirect<S>(props: RedirectProps<S>, children: any): VNode {
+    if (props.dispatch) {
+        props.dispatch(MoveTo, { to: props.to, replace: props.push })
+    } else {
+        props.push ? pushHistory(props.to) : replaceHistory(props.to)
+    }
+    return h('a', null)
+}
+
+export const MoveTo: Action<any, { to: string, replace?: boolean, ev?: Event }> = (state, params) => {
+    params.ev && params.ev.preventDefault()
+    return [state, (params.replace ? ReplaceHistory : PushHistory).create(undefined as any, params)]
 }
