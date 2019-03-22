@@ -107,28 +107,26 @@ var updateProperty = function (element: Element, name: string, value: any, newVa
                 element[name][i as any] = style
             }
         }
-    } else {
-        if (name[0] === "o" && name[1] === "n") {
-            if (
-                !((element.events || (element.events = {}))[
-                    (name = name.slice(2).toLowerCase())
-                ] = newValue)
-            ) {
-                element.removeEventListener(name, eventCb)
-            } else if (!value) {
-                element.addEventListener(name, eventCb)
-            }
-        } else if (name !== "list" && !isSvg && name in element) {
-            (element as any)[name] = newValue == null ? "" : newValue
-        } else if (
-            newValue == null ||
-            newValue === false ||
-            (name === "class" && !(newValue = createClass(newValue)))
+    } else if (name[0] === "o" && name[1] === "n") {
+        if (
+            !((element.events || (element.events = {}))[
+                (name = name.slice(2).toLowerCase())
+            ] = newValue)
         ) {
-            element.removeAttribute(convName(name, isSvg))
-        } else {
-            element.setAttribute(convName(name, isSvg), newValue)
+            element.removeEventListener(name, eventCb)
+        } else if (!value) {
+            element.addEventListener(name, eventCb)
         }
+    } else if (name !== "list" && !isSvg && name in element) {
+        (element as any)[name] = newValue == null ? "" : newValue
+    } else if (
+        newValue == null ||
+        newValue === false ||
+        (name === "class" && !(newValue = createClass(newValue)))
+    ) {
+        element.removeAttribute(convName(name, isSvg))
+    } else {
+        element.setAttribute(convName(name, isSvg), newValue)
     }
 }
 
