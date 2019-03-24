@@ -140,7 +140,7 @@ app<State>({
         auto: false,
         input: '',
         part: {
-            p: 0,
+            value: 0,
         },
         routing: undefined,
     },

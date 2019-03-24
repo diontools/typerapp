@@ -609,3 +609,24 @@ export interface ClassObject {
 export interface ClassArray extends Array<Class> { }
 
 export type Class = string | number | ClassObject | ClassArray
+
+export type ReturnParams<E> =
+    E extends Effect<any, infer R, any> ? R :
+    E extends Subscription<any, infer R, any> ? R :
+    E;
+
+export function actionCreator<S>() {
+    return <N extends keyof S>(name: N): (<P = undefined>(action: Action<S[N], ReturnParams<P>>) => Action<S, ReturnParams<P>>) => {
+        return (action) => {
+            return (state, params) => {
+                const r = action(state[name], params)
+                if (Array.isArray(r)) {
+                    const a: ActionResult<S> = [{ ...state, [name]: r[0] }]
+                    for (let i = 1; i < r.length; i++) a.push(r[i] as EffectObject<any, any>)
+                    return a
+                }
+                return { ...state, [name]: r }
+            }
+        }
+    }
+}

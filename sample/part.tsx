@@ -1,16 +1,21 @@
-import { h, Action, View } from 'typerapp'
-import { Delay } from 'typerapp/fx';
+import { h, View, actionCreator } from 'typerapp'
+import { HttpText } from 'typerapp/fx';
 import { State } from './states'
 
-const DelayedCountUp = Delay.createAction<State>(state => ({ ...state, part: { p: state.part.p + 1 } }))
+const createPartAction = actionCreator<State>()('part')
 
-const Add: Action<State, { amount: number }> = (state, params) => [
-    { ...state, part: { p: state.part.p + params.amount } },
-    Delay.create(DelayedCountUp, { duration: 200 })
-]
+const TextReceived = createPartAction<typeof HttpText>((state, params) => ({
+    ...state,
+    value: params.text.length,
+}))
+
+const RequestText = createPartAction((state) => [
+    state,
+    HttpText.create(TextReceived, '/'),
+])
 
 export const view: View<State> = ({ part: state }, dispatch) => (
     <div>
-        {state.p} <button onClick={ev => dispatch(Add, { amount: 1 })}>add</button>
+        {state.value} <button onClick={ev => dispatch(RequestText)}>request</button>
     </div>
 )

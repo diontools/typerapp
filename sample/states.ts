@@ -10,7 +10,7 @@ export type State = {
     auto: boolean,
     input: string,
     part: {
-        p: number,
+        value: number,
     },
     routing?: RoutingInfo<State, RouteProps>,
 }
