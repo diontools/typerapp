@@ -31,6 +31,11 @@ const view: View<State> = (state, dispatch) => <div>
     <button onClick={ev => dispatch([NormalAction])}></button>
     <button onClick={ev => dispatch([NormalAction, undefined])}></button>
     <button onClick={ev => dispatch([NormalAction, { a: 1 }])}></button>
+    <button onClick={ev => dispatch([])}></button>
+    <button onClick={ev => dispatch([undefined])}></button>
+    <button onClick={ev => dispatch([1])}></button>
+    <button onClick={ev => dispatch(['a'])}></button>
+    <button onClick={ev => dispatch([null])}></button>
 
     
     {/* OK */}
