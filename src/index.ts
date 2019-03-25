@@ -498,16 +498,16 @@ type VNodeWithKey = { [key: string]: VNode | boolean }
 export type ActionResult<S> = S | [S, ...EffectObject<any, any>[]]
 export type Action<S, P = undefined> = (state: S, params: P) => ActionResult<S>
 
-export type EffectAction<S, P, R> = [Action<S, P & R>, P]
+export type EffectAction<S, P, R> = [Action<S, CombineType<P, R>>, P]
 
 export type EffectRunner<RunnerProps, ReturnProps> = <S, P>(
-    props: { action: EffectAction<S, P, ReturnProps> } & RunnerProps,
+    props: CombineType<{ action: EffectAction<S, P, ReturnProps> }, RunnerProps>,
     dispatch: Dispatch<S>
 ) => void
 
 export type EffectObject<RunnerProps, ReturnProps> = [EffectRunner<RunnerProps, ReturnProps>, RunnerProps]
 
-export class Effect<Props, ReturnProps = {}, RunnerProps = Props> {
+export class Effect<Props, ReturnProps = undefined, RunnerProps = Props> {
     public constructor(
         private runner: EffectRunner<RunnerProps, ReturnProps>,
         private creator: <S, P>(
@@ -516,13 +516,13 @@ export class Effect<Props, ReturnProps = {}, RunnerProps = Props> {
             runner: EffectRunner<RunnerProps, ReturnProps>) => EffectObject<RunnerProps, ReturnProps>) {
     }
 
-    create<S>(action: Action<S, undefined & ReturnProps>, props: Props): EffectObject<RunnerProps, ReturnProps>
+    create<S>(action: Action<S, ReturnProps>, props: Props): EffectObject<RunnerProps, ReturnProps>
     create<S, P>(action: EffectAction<S, P, ReturnProps>, props: Props): EffectObject<RunnerProps, ReturnProps>
-    create<S, P>(action: Action<S, P & ReturnProps> | EffectAction<S, P, ReturnProps>, props: Props) {
-        return this.creator(isArray(action) ? action : [action, {} as P & ReturnProps], props, this.runner)
+    create<S, P>(action: Action<S, ReturnProps> | EffectAction<S, P, ReturnProps>, props: Props) {
+        return this.creator(isArray(action) ? action : [action] as any, props, this.runner)
     }
 
-    createAction<S, P = undefined>(action: Action<S, P & ReturnProps>): Action<S, P & ReturnProps> {
+    createAction<S, P = undefined>(action: Action<S, CombineType<P, ReturnProps>>): Action<S, CombineType<P, ReturnProps>> {
         return action
     }
 }
@@ -543,10 +543,10 @@ export class Subscription<Props, ReturnProps = {}, RunnerProps = Props>{
             runner: SubscriptionRunner<Props, ReturnProps>) => SubscriptionObject<RunnerProps, ReturnProps>) {
     }
 
-    create<S>(action: Action<S, undefined & ReturnProps>, props: Props): SubscriptionObject<RunnerProps, ReturnProps>
+    create<S>(action: Action<S, ReturnProps>, props: Props): SubscriptionObject<RunnerProps, ReturnProps>
     create<S, P>(action: EffectAction<S, P, ReturnProps>, props: Props): SubscriptionObject<RunnerProps, ReturnProps>
-    create<S, P>(action: Action<S, P & ReturnProps> | EffectAction<S, P, ReturnProps>, props: Props) {
-        return this.creator(isArray(action) ? action : [action, {} as P & ReturnProps], props, this.runner)
+    create<S, P>(action: Action<S, ReturnProps> | EffectAction<S, P, ReturnProps>, props: Props) {
+        return this.creator(isArray(action) ? action : [action, {}] as any, props, this.runner)
     }
 
     createAction<S, P = undefined>(action: Action<S, P & ReturnProps>): Action<S, P & ReturnProps> {
@@ -610,13 +610,18 @@ export interface ClassArray extends Array<Class> { }
 
 export type Class = string | number | ClassObject | ClassArray
 
+export type CombineType<T1, T2> =
+    T1 extends undefined
+    ? T2 extends undefined ? undefined : T2
+    : T2 extends undefined ? T1 : T1 & T2;
+
 export type ReturnParams<E> =
     E extends Effect<any, infer R, any> ? R :
     E extends Subscription<any, infer R, any> ? R :
     E;
 
 export function actionCreator<S>() {
-    return <N extends keyof S>(name: N): (<P = undefined>(action: Action<S[N], ReturnParams<P>>) => Action<S, ReturnParams<P>>) => {
+    return <N extends keyof S>(name: N): (<P1 = undefined, P2 = undefined>(action: Action<S[N], CombineType<ReturnParams<P1>, P2>>) => Action<S, CombineType<ReturnParams<P1>, P2>>) => {
         return (action) => {
             return (state, params) => {
                 const r = action(state[name], params)

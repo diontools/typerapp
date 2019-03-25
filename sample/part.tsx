@@ -2,20 +2,18 @@ import { h, View, actionCreator } from 'typerapp'
 import { HttpText } from 'typerapp/fx';
 import { State } from './states'
 
-const createPartAction = actionCreator<State>()('part')
+const createAction = actionCreator<State>()('part')
 
-const TextReceived = createPartAction<typeof HttpText>((state, params) => ({
+const TextReceived = createAction<typeof HttpText>((state, params) => ({
     ...state,
     value: params.text.length,
 }))
 
-const RequestText = createPartAction((state) => [
+const RequestText = createAction<string>((state) => [
     state,
     HttpText.create(TextReceived, '/'),
 ])
 
-export const view: View<State> = ({ part: state }, dispatch) => (
-    <div>
-        {state.value} <button onClick={ev => dispatch(RequestText)}>request</button>
-    </div>
-)
+export const view: View<State> = ({ part: state }, dispatch) => <div>
+    {state.value} <button onClick={ev => dispatch(RequestText, '/')}>request</button>
+</div>
