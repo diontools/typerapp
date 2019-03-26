@@ -13,9 +13,11 @@ export type PathSeg = string | {
     id: string
 }
 
+export type RouteView<S> = (state: S, dispatch: Dispatch<S>, params: RouteParams) => VNode
+
 export type Route<S, P> = {
     path: string
-    view: (state: S, dispatch: Dispatch<S>, params: RouteParams) => VNode
+    view: RouteView<S>
     _pathSegs?: PathSeg[]
 } & {
         [N in keyof P]: P[N]
