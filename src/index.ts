@@ -525,6 +525,18 @@ export class Effect<Props, ReturnProps = {}, RunnerProps = Props> {
     }
 }
 
+export type EffectRunner2<P> = (
+    props: P,
+    dispatch: Dispatch<any>
+) => void
+
+export type EffectO<P> = [EffectRunner2<P>, P]
+
+export type EffectAction2<S, P, R = undefined> =
+    R extends undefined
+    ? Action<S, P> | [Action<S, P>, P] | ActionResult<S>
+    : Action<S, P & R> | [Action<S, P & R>, P] | ActionResult<S>
+
 export type SubscriptionRunner<RunnerProps, ReturnProps> = <S, P>(
     props: { action: EffectAction<S, P, ReturnProps> } & RunnerProps,
     dispatch: Dispatch<S>
