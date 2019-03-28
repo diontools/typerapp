@@ -516,8 +516,6 @@ export class Effect<Props, ReturnProps = {}, RunnerProps = Props> {
             runner: EffectRunner<RunnerProps, ReturnProps>) => EffectObject<RunnerProps, ReturnProps>) {
     }
 
-    create<S>(action: Action<S, ReturnProps>, props: Props): EffectObject<RunnerProps, ReturnProps>
-    create<S, P>(action: EffectAction<S, P, ReturnProps>, props: Props): EffectObject<RunnerProps, ReturnProps>
     create<S, P>(action: Action<S, ReturnProps> | EffectAction<S, P, ReturnProps>, props: Props) {
         return this.creator(isArray(action) ? action : [action] as any, props, this.runner)
     }
@@ -543,8 +541,6 @@ export class Subscription<Props, ReturnProps = {}, RunnerProps = Props>{
             runner: SubscriptionRunner<Props, ReturnProps>) => SubscriptionObject<RunnerProps, ReturnProps>) {
     }
 
-    create<S>(action: Action<S, ReturnProps>, props: Props): SubscriptionObject<RunnerProps, ReturnProps>
-    create<S, P>(action: EffectAction<S, P, ReturnProps>, props: Props): SubscriptionObject<RunnerProps, ReturnProps>
     create<S, P>(action: Action<S, ReturnProps> | EffectAction<S, P, ReturnProps>, props: Props) {
         return this.creator(isArray(action) ? action : [action, {}] as any, props, this.runner)
     }
