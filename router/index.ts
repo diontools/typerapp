@@ -30,49 +30,46 @@ export type RoutingInfo<S, P> = {
     params: RouteParams
 }
 
-export function createRouter<S, P>(props: RouterProps<S, P>) {
-    const subs = new Subscription<RouterProps<S, P>>(
-        (props, dispatch) => {
-            debug(['routing'])
-            function onLocationChanged() {
-                const pathname = window.location.pathname
-                debug([pathname])
-                for (const route of props.routes) {
-                    route._pathSegs = route._pathSegs || splitPath(route.path)
-                    const params = matchPath(pathname, route._pathSegs)
-                    if (params) {
-                        props.matched({ route, params }, dispatch as any)
-                        return
-                    }
-                }
-                props.matched(undefined, dispatch as any)
+const runner = <S, P>(props: RouterProps<S, P>, dispatch: Dispatch<S>) => {
+    debug(['routing'])
+    function onLocationChanged() {
+        const pathname = window.location.pathname
+        debug([pathname])
+        for (const route of props.routes) {
+            route._pathSegs = route._pathSegs || splitPath(route.path)
+            const params = matchPath(pathname, route._pathSegs)
+            if (params) {
+                props.matched({ route, params }, dispatch)
+                return
             }
+        }
+        props.matched(undefined, dispatch)
+    }
 
-            const push = window.history.pushState
-            const replace = window.history.replaceState
-            window.history.pushState = function (data, title, url) {
-                push.call(this, data, title, url)
-                onLocationChanged()
-            }
-            window.history.replaceState = function (data, title, url) {
-                replace.call(this, data, title, url)
-                onLocationChanged()
-            }
-            window.addEventListener("popstate", onLocationChanged)
+    const push = window.history.pushState
+    const replace = window.history.replaceState
+    window.history.pushState = function (data, title, url) {
+        push.call(this, data, title, url)
+        onLocationChanged()
+    }
+    window.history.replaceState = function (data, title, url) {
+        replace.call(this, data, title, url)
+        onLocationChanged()
+    }
+    window.addEventListener("popstate", onLocationChanged)
 
-            onLocationChanged()
+    onLocationChanged()
 
-            return () => {
-                debug(['unrouting'])
-                window.history.pushState = push
-                window.history.replaceState = replace
-                window.removeEventListener("popstate", onLocationChanged)
-            }
-        },
-        (action, props, runner) => [runner, { action, ...props }]
-    )
+    return () => {
+        debug(['unrouting'])
+        window.history.pushState = push
+        window.history.replaceState = replace
+        window.removeEventListener("popstate", onLocationChanged)
+    }
+}
 
-    return subs.create(undefined as any, props)
+export function createRouter<S, P>(props: RouterProps<S, P>): Subscription<S, RouterProps<S, P>> {
+    return [runner, props]
 }
 
 function splitPath(path: string): PathSeg[] {
@@ -120,15 +117,13 @@ function replaceHistory(to: string) {
     window.history.replaceState(null, '', to)
 }
 
-export const PushHistory = new Effect<{ to: string }>(
-    (props, dispatch) => pushHistory(props.to),
-    (action, props, runner) => [runner, { action, ...props }]
-)
+export function PushHistory<S>(to: string): Effect<S, string> {
+    return [<S, P>(to: string, dispatch: Dispatch<S>) => pushHistory(to), to]
+}
 
-export const ReplaceHistory = new Effect<{ to: string }>(
-    (props, dispatch) => replaceHistory(props.to),
-    (action, props, runner) => [runner, { action, ...props }]
-)
+export function ReplaceHistory<S>(to: string): Effect<S, string> {
+    return [<S, P>(to: string, dispatch: Dispatch<S>) => replaceHistory(to), to]
+}
 
 export interface LinkProps<S> {
     to: string
@@ -169,5 +164,5 @@ export function Redirect<S>(props: RedirectProps<S>, children: any): VNode {
 
 export const MoveTo: Action<any, { to: string, replace?: boolean, ev?: Event }> = (state, params) => {
     params.ev && params.ev.preventDefault()
-    return [state, (params.replace ? ReplaceHistory : PushHistory).create(undefined as any, params)]
+    return [state, (params.replace ? ReplaceHistory : PushHistory)(params.to)]
 }
