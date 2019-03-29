@@ -1,5 +1,5 @@
-import { h, View, Action, actionCreator } from 'typerapp'
-import { Delay, HttpText } from 'typerapp/fx';
+import { h, View, Action, actionCreator, ActionParamOf } from 'typerapp'
+import { delay, http } from 'typerapp/fx';
 
 type State = {
     value: number,
@@ -37,7 +37,7 @@ const view: View<State> = (state, dispatch) => <div>
     <button onClick={ev => dispatch(['a'])}></button>
     <button onClick={ev => dispatch([null])}></button>
 
-    
+
     {/* OK */}
     <button onClick={ev => dispatch(ParamAction, { value: 1 })}></button>
     <button onClick={ev => dispatch([ParamAction, { value: 1 }])}></button>
@@ -54,82 +54,77 @@ const view: View<State> = (state, dispatch) => <div>
 </div>
 
 
-const DelayAction = Delay.createAction<State>((state, params) => ({
-    ...state
-}))
+const DelayAction: Action<State> = state => ({ ...state })
 
 // OK
-Delay.create(DelayAction, { duration: 1 })
-Delay.create([DelayAction, undefined], { duration: 1 })
+delay(DelayAction, { duration: 1000 })
+delay([DelayAction, {}], { duration: 1000 })
 
 // NG
-Delay.create(DelayAction)
-Delay.create(DelayAction, undefined)
-Delay.create(DelayAction, {})
-Delay.create([DelayAction])
-Delay.create([DelayAction, undefined])
-Delay.create([DelayAction, undefined], {})
+delay(DelayAction)
+delay(DelayAction, undefined)
+delay(DelayAction, {})
+delay([DelayAction])
+delay([DelayAction, undefined], undefined)
+delay([DelayAction, {}], {})
+delay([DelayAction, { x: 1 }], { duration: 1000 })
 
 
-const DelayParamsAction = Delay.createAction<State, { value: number }>((state, params) => ({
+const DelayParamedAction: Action<State, { value: number }> = (state, params) => ({
     ...state,
-    value: state.value + params.value,
-}))
+    value: params.value,
+})
 
 // OK
-Delay.create([DelayParamsAction, { value: 1 }], { duration: 1 })
+delay([DelayParamedAction, { value: 1 }], { duration: 1000 })
 
 // NG
-Delay.create(DelayParamsAction)
-Delay.create(DelayParamsAction, undefined)
-Delay.create(DelayParamsAction, {})
-Delay.create(DelayParamsAction, { duration: 1 })
-Delay.create([DelayParamsAction])
-Delay.create([DelayParamsAction, undefined])
-Delay.create([DelayParamsAction, {}])
-Delay.create([DelayParamsAction, undefined], { duration: 1 })
-Delay.create([DelayParamsAction, {}], { duration: 1 })
-Delay.create([DelayParamsAction, { a: 1 }], { duration: 1 })
+delay([DelayParamedAction, { value: 'a' }], { duration: 1000 })
+delay([DelayParamedAction, { a: 1 }], { duration: 1000 })
+delay([DelayParamedAction, 1], { duration: 1000 })
+delay([DelayParamedAction, undefined], { duration: 1000 })
+delay([DelayParamedAction, null], { duration: 1000 })
+delay([DelayParamedAction], { duration: 1000 })
+delay(DelayParamedAction, { duration: 1000 })
 
 
-const HttpAction = HttpText.createAction<State>((state, params) => ({
+const HttpAction: Action<State> = state => state
+
+// OK
+http(HttpAction, '/')
+http([HttpAction, {}], '/')
+
+// NG
+http(undefined, '/')
+http(null, '/')
+http({}, '/')
+http([HttpAction], '/')
+http([HttpAction, undefined], '/')
+http([HttpAction, null], '/')
+http([HttpAction, {}], '/')
+http([HttpAction, 1], '/')
+http([HttpAction, { a: 1 }], '/')
+
+
+const HttpParamedAction: Action<State, { value: number } & ActionParamOf<typeof http>> = (state, params) => ({
     ...state,
-    text: params.text,
-}))
+    value: params.value + params.response.status,
+})
 
 // OK
-HttpText.create(HttpAction, '/')
-HttpText.create([HttpAction, undefined], '/')
+http([HttpParamedAction, { value: 1 }], '/')
 
 // NG
-HttpText.create(HttpAction, undefined)
-HttpText.create(HttpAction, {})
-HttpText.create(HttpAction, { a: 1 })
-HttpText.create([HttpAction], '/')
-HttpText.create([HttpAction, 1], '/')
-HttpText.create([HttpAction, 'a'], '/')
-HttpText.create([HttpAction, {}], '/')
-HttpText.create([HttpAction, { a: 1 }], '/')
-HttpText.create([HttpAction, { text: 1 }], '/')
+http([HttpParamedAction, { value: 'a' }], '/')
+http([HttpParamedAction, { a: 1 }], '/')
+http([HttpParamedAction, {}], '/')
+http([HttpParamedAction, undefined], '/')
+http([HttpParamedAction, null], '/')
+http([HttpParamedAction, 1], '/')
+http([HttpParamedAction], '/')
+http(HttpParamedAction, '/')
+http(null, '/')
 
-
-const HttpParamsAction = HttpText.createAction<State, { value: number }>((state, params) => ({
-    ...state,
-    text: params.text + params.value.toFixed(),
-}))
-
-// OK
-HttpText.create([HttpParamsAction, { value: 1 }], '/')
-
-// NG
-HttpText.create(HttpParamsAction, '/')
-HttpText.create([HttpParamsAction], '/')
-HttpText.create([HttpParamsAction, undefined], '/')
-HttpText.create([HttpParamsAction, 1], '/')
-HttpText.create([HttpParamsAction, 'a'], '/')
-HttpText.create([HttpParamsAction, null], '/')
-HttpText.create([HttpParamsAction, {}], '/')
-HttpText.create([HttpParamsAction, { a: 1 }], '/')
 
 
 const partAction = actionCreator<State>()('part')

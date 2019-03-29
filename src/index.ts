@@ -495,83 +495,39 @@ export var app = function <S>(props: AppProps<S>) {
 type EventCb = (ev: Event) => void
 type VNodeWithKey = { [key: string]: VNode | boolean }
 
-export type ActionResult<S> = S | [S, ...EffectObject<any, any>[]]
+export type ActionResult<S> = S | [S, ...Effect<any, any>[]]
 export type Action<S, P = {}> = (state: S, params: P) => ActionResult<S>
 
-export type EffectAction<S, P, R> = [Action<S, P & R>, P]
+export type Effect<S, P = {}> = [(props: P, dispatch: Dispatch<S>) => void, P]
 
-export type EffectRunner<RunnerProps, ReturnProps> = <S, P>(
-    props: { action: EffectAction<S, P, ReturnProps> } & RunnerProps,
-    dispatch: Dispatch<S>
-) => void
-
-export type EffectObject<RunnerProps, ReturnProps> = [EffectRunner<RunnerProps, ReturnProps>, RunnerProps]
-
-export class Effect<Props, ReturnProps = {}, RunnerProps = Props> {
-    public constructor(
-        private runner: EffectRunner<RunnerProps, ReturnProps>,
-        private creator: <S, P>(
-            action: EffectAction<S, P, ReturnProps>,
-            props: Props,
-            runner: EffectRunner<RunnerProps, ReturnProps>) => EffectObject<RunnerProps, ReturnProps>) {
-    }
-
-    create<S, P>(action: Action<S, ReturnProps> | EffectAction<S, P, ReturnProps>, props: Props) {
-        return this.creator(isArray(action) ? action : [action] as any, props, this.runner)
-    }
-
-    createAction<S, P = {}>(action: Action<S, P & ReturnProps>): Action<S, P & ReturnProps> {
-        return action
-    }
-}
-
-export type EffectRunner2<P> = (
-    props: P,
-    dispatch: Dispatch<any>
-) => void
-
-export type EffectO<P> = [EffectRunner2<P>, P]
-
-export type EffectAction2<S, P, R = undefined> =
+export type EffectAction<S, P, R = undefined> =
     R extends undefined
-    ? Action<S, P> | [Action<S, P>, P] | ActionResult<S>
-    : Action<S, P & R> | [Action<S, P & R>, P] | ActionResult<S>
+    ? Action<S, {}> | [Action<S, P>, P]
+    : Action<S, R> | [Action<S, P & R>, P]
 
-export type SubscriptionRunner<RunnerProps, ReturnProps> = <S, P>(
-    props: { action: EffectAction<S, P, ReturnProps> } & RunnerProps,
-    dispatch: Dispatch<S>
-) => () => void
+// extract from union
+type Filter<T, U> = T extends U ? T : never
+// tuple to union
+type ElementOf<T> = T extends (infer E)[] ? E : T
 
-export type SubscriptionObject<RunnerProps, ReturnProps> = [SubscriptionRunner<RunnerProps, ReturnProps>, RunnerProps]
+export type ActionParamType<T> = T extends Action<any, infer R> ? R : never
 
-export class Subscription<Props, ReturnProps = {}, RunnerProps = Props>{
-    public constructor(
-        private runner: SubscriptionRunner<Props, ReturnProps>,
-        private creator: <S, P>(
-            action: EffectAction<S, P, ReturnProps>,
-            props: Props,
-            runner: SubscriptionRunner<Props, ReturnProps>) => SubscriptionObject<RunnerProps, ReturnProps>) {
-    }
+/** Extract action parameter type from Effect Constructor */
+export type ActionParamOf<T extends (...args: any[]) => any> = ActionParamType<Filter<ElementOf<Parameters<T>>, Action<any, any>>>
 
-    create<S, P>(action: Action<S, ReturnProps> | EffectAction<S, P, ReturnProps>, props: Props) {
-        return this.creator(isArray(action) ? action : [action, {}] as any, props, this.runner)
-    }
+export type Subscription<S, P = {}> = [(props: P, dispatch: Dispatch<S>) => () => void, P]
 
-    createAction<S, P = {}>(action: Action<S, P & ReturnProps>): Action<S, P & ReturnProps> {
-        return action
-    }
-}
-
-export type SubscriptionType = SubscriptionObject<any, any> | boolean
+export type SubscriptionType = Subscription<any, any> | boolean
 
 export type SubscriptionsResult =
     | SubscriptionType[]
 
 export type Dispatch<S> = {
-    <P>(action: Action<S, P>, params: P): void
     (action: Action<S, {}>): void
+    <P>(action: Action<S, P>, params: P): void
     <P>(actionWithParams: [Action<S, P>, P]): void
     (result: ActionResult<S>): void
+    <P>(all: Action<S, {}> | [Action<S, P>, P] | ActionResult<S>): void
 }
 
 export type View<S> = (state: S, dispatch: Dispatch<S>) => VNode
@@ -618,19 +574,14 @@ export interface ClassArray extends Array<Class> { }
 
 export type Class = string | number | ClassObject | ClassArray
 
-export type ReturnParams<E> =
-    E extends Effect<any, infer R, any> ? R :
-    E extends Subscription<any, infer R, any> ? R :
-    E;
-
 export function actionCreator<S>() {
-    return <N extends keyof S>(name: N): (<P1 = {}, P2 = {}>(action: Action<S[N], ReturnParams<P1> & P2>) => Action<S, ReturnParams<P1> & P2>) => {
+    return <N extends keyof S>(name: N): (<P1 = {}, P2 = {}>(action: Action<S[N], P1 & P2>) => Action<S, P1 & P2>) => {
         return (action) => {
             return (state, params) => {
                 const r = action(state[name], params)
                 if (Array.isArray(r)) {
                     const a: ActionResult<S> = [{ ...state, [name]: r[0] }]
-                    for (let i = 1; i < r.length; i++) a.push(r[i] as EffectObject<any, any>)
+                    for (let i = 1; i < r.length; i++) a.push(r[i] as Effect<any, any>)
                     return a
                 }
                 return { ...state, [name]: r }

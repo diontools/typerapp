@@ -1,17 +1,17 @@
-import { h, View, actionCreator } from 'typerapp'
-import { HttpText } from 'typerapp/fx';
+import { h, View, actionCreator, ActionParamOf } from 'typerapp'
+import { httpText } from 'typerapp/fx';
 import { State } from './states'
 
 const createAction = actionCreator<State>()('part')
 
-const TextReceived = createAction<typeof HttpText>((state, params) => ({
+const TextReceived = createAction<ActionParamOf<typeof httpText>>((state, params) => ({
     ...state,
     value: params.text.length,
 }))
 
 const RequestText = createAction<string>((state) => [
     state,
-    HttpText.create(TextReceived, '/'),
+    httpText(TextReceived, '/'),
 ])
 
 export const view: View<State> = ({ part: state }, dispatch) => <div>

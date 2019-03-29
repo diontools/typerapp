@@ -1,9 +1,15 @@
-import { Subscription } from 'typerapp'
+import { EffectAction, Dispatch, Subscription } from 'typerapp'
 
-export const Timer = new Subscription<{ interval: number }>((props, dispatch) => {
-    const id = setInterval(
-        () => dispatch(props.action[0], props.action[1]),
-        props.interval
-    )
+export type TimerProps<S, P> = {
+    action: EffectAction<S, P>
+    interval: number
+}
+
+const timerRunner = <S, P>(props: TimerProps<S, P>, dispatch: Dispatch<S>) => {
+    const id = setInterval(() => dispatch(props.action), props.interval)
     return () => clearInterval(id)
-}, (action, props, runner) => [runner, { action, ...props }])
+}
+
+export function timer<S, P>(action: TimerProps<S, P>['action'], props: { interval: number }): Subscription<S, TimerProps<S, P>> {
+    return [timerRunner, { action, interval: props.interval }]
+}

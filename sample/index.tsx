@@ -1,7 +1,7 @@
-import { h, app, Action, Lazy, Dispatch } from 'typerapp'
+import { h, app, Action, Lazy, Dispatch, ActionParamOf } from 'typerapp'
 import { Helmet } from 'typerapp/helmet'
 import { style } from 'typerapp/style'
-import { Delay, Timer, HttpText } from 'typerapp/fx';
+import { timer, httpText, execute, delay } from 'typerapp/fx';
 import { createRouter, Link, Route, RoutingInfo, Redirect } from 'typerapp/router'
 import { State, RouteProps } from './states'
 import * as part from './part'
@@ -14,7 +14,7 @@ const Add: Action<State, { amount: number }> = (state, params) => ({
 
 const AddWithDelay: Action<State, { duration: number, amount: number }> = (state, params) => [
     state,
-    Delay.create([Add, { amount: params.amount }], { duration: params.duration }),
+    delay([Add, { amount: params.amount }], { duration: params.duration }),
 ]
 
 
@@ -26,10 +26,21 @@ const ToggleAuto: Action<State> = state => ({
 
 const Input: Action<State, string> = (state, value) => ({ ...state, input: value })
 
-const OnTextResponse = HttpText.createAction<State>((state, params) => ({
+const OnTextResponse: Action<State, ActionParamOf<typeof httpText>> = (state, params) => ({
     ...state,
     text: params.text
-}))
+})
+
+const Act1: Action<State> = state => ({ ...state, value: state.value + 1 })
+const Act2: Action<State> = state => ({ ...state, value: state.value + 2 })
+const Act3: Action<State, { newValue: number }> = (state, params) => ({ ...state, value: params.newValue })
+
+execute<State>(dispatch => {
+    dispatch(Act1)
+    dispatch(Act2)
+    dispatch(Act3, { newValue: 3 })
+    dispatch([Act3, { newValue: 4 }])
+})
 
 const lazyView = (p: { auto: State['auto'] }) => (
     <div class={{ auto: p.auto }}>
@@ -93,7 +104,7 @@ const router = createRouter<State, RouteProps>({
         path: '/fetch',
         view: (state, dispatch, params) => <div>
             <h2>Fetch</h2>
-            <button onClick={ev => dispatch([state, HttpText.create(OnTextResponse, '/')])}>http requst</button>
+            <button onClick={ev => dispatch([state, httpText(OnTextResponse, '/')])}>http requst</button>
             <button onClick={ev => dispatch({ ...state, text: '' })}>clear text</button>
             <div>text: {state.text}</div>
         </div>,
@@ -165,7 +176,7 @@ app<State>({
     ),
     subscriptions: state => [
         router,
-        state.auto && Timer.create([Add, { amount: 1 }], { interval: 500 }),
+        state.auto && timer([Add, { amount: 1 }], { interval: 500 }),
     ],
     container: document.body,
 })
