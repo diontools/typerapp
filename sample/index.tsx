@@ -2,7 +2,7 @@ import { h, app, Action, Lazy, Dispatch, ActionParamOf } from 'typerapp'
 import { Helmet } from 'typerapp/helmet'
 import { style } from 'typerapp/style'
 import { timer, httpText, execute, delay } from 'typerapp/fx';
-import { createRouter, Link, Route, RoutingInfo, Redirect } from 'typerapp/router'
+import { createRouter, Link, RoutingInfo, Redirect } from 'typerapp/router'
 import { State, RouteProps } from './states'
 import * as part from './part'
 
