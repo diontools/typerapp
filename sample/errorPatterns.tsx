@@ -22,14 +22,15 @@ const ParamAction: Action<State, { value: number }> = (state, params) => ({
 const view: View<State> = (state, dispatch) => <div>
     {/* OK */}
     <button onClick={ev => dispatch(NormalAction)}></button>
-    <button onClick={ev => dispatch(NormalAction, {})}></button>
-    <button onClick={ev => dispatch([NormalAction, {}])}></button>
 
     {/* NG */}
     <button onClick={ev => dispatch(NormalAction, undefined)}></button>
+    <button onClick={ev => dispatch(NormalAction, {})}></button>
+    <button onClick={ev => dispatch(NormalAction, { ___dummy: 1 })}></button>
     <button onClick={ev => dispatch(NormalAction, { a: 1 })}></button>
     <button onClick={ev => dispatch([NormalAction])}></button>
     <button onClick={ev => dispatch([NormalAction, undefined])}></button>
+    <button onClick={ev => dispatch([NormalAction, {}])}></button>
     <button onClick={ev => dispatch([NormalAction, { a: 1 }])}></button>
     <button onClick={ev => dispatch([])}></button>
     <button onClick={ev => dispatch([undefined])}></button>
@@ -58,15 +59,14 @@ const DelayAction: Action<State> = state => ({ ...state })
 
 // OK
 delay(DelayAction, { duration: 1000 })
-delay([DelayAction, {}], { duration: 1000 })
 
 // NG
 delay(DelayAction)
 delay(DelayAction, undefined)
 delay(DelayAction, {})
-delay([DelayAction])
-delay([DelayAction, undefined], undefined)
-delay([DelayAction, {}], {})
+delay([DelayAction], { duration: 1000 })
+delay([DelayAction, undefined], { duration: 1000 })
+delay([DelayAction, {}], { duration: 1000 })
 delay([DelayAction, { x: 1 }], { duration: 1000 })
 
 
@@ -90,11 +90,9 @@ delay(DelayParamedAction, { duration: 1000 })
 
 const HttpAction: Action<State> = state => state
 
-// OK
+// NG
 http(HttpAction, '/')
 http([HttpAction, {}], '/')
-
-// NG
 http(undefined, '/')
 http(null, '/')
 http({}, '/')

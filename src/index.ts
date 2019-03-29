@@ -495,14 +495,16 @@ export var app = function <S>(props: AppProps<S>) {
 type EventCb = (ev: Event) => void
 type VNodeWithKey = { [key: string]: VNode | boolean }
 
-export type ActionResult<S> = S | [S, ...Effect<any, any>[]]
-export type Action<S, P = {}> = (state: S, params: P) => ActionResult<S>
+export type Empty = { ___dummy: never }
 
-export type Effect<S, P = {}> = [(props: P, dispatch: Dispatch<S>) => void, P]
+export type ActionResult<S> = S | [S, ...Effect<any, any>[]]
+export type Action<S, P = Empty> = (state: S, params: P) => ActionResult<S>
+
+export type Effect<S, P = Empty> = [(props: P, dispatch: Dispatch<S>) => void, P]
 
 export type EffectAction<S, P, R = undefined> =
     R extends undefined
-    ? Action<S, {}> | [Action<S, P>, P]
+    ? Action<S, Empty> | [Action<S, P>, P]
     : Action<S, R> | [Action<S, P & R>, P]
 
 // extract from union
@@ -515,7 +517,7 @@ export type ActionParamType<T> = T extends Action<any, infer R> ? R : never
 /** Extract action parameter type from Effect Constructor */
 export type ActionParamOf<T extends (...args: any[]) => any> = ActionParamType<Filter<ElementOf<Parameters<T>>, Action<any, any>>>
 
-export type Subscription<S, P = {}> = [(props: P, dispatch: Dispatch<S>) => () => void, P]
+export type Subscription<S, P = Empty> = [(props: P, dispatch: Dispatch<S>) => () => void, P]
 
 export type SubscriptionType = Subscription<any, any> | boolean
 
@@ -523,11 +525,11 @@ export type SubscriptionsResult =
     | SubscriptionType[]
 
 export type Dispatch<S> = {
-    (action: Action<S, {}>): void
+    (action: Action<S, Empty>): void
     <P>(action: Action<S, P>, params: P): void
     <P>(actionWithParams: [Action<S, P>, P]): void
     (result: ActionResult<S>): void
-    <P>(all: Action<S, {}> | [Action<S, P>, P] | ActionResult<S>): void
+    <P>(all: Action<S, Empty> | [Action<S, P>, P] | ActionResult<S>): void
 }
 
 export type View<S> = (state: S, dispatch: Dispatch<S>) => VNode
