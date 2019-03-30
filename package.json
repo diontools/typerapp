@@ -35,7 +35,8 @@
     "helmet",
     "style",
     "fx",
-    "router"
+    "router",
+    "types"
   ],
   "sideEffects": [
     "./src/svg-alias.ts"
