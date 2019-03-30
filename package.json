@@ -1,13 +1,14 @@
 {
   "name": "typerapp",
-  "version": "0.0.0-alpha.20",
+  "version": "0.0.0-alpha.27",
   "description": "",
-  "main": "main/index.ts",
+  "main": "lib/main/index.js",
   "types": "main/index.ts",
   "scripts": {
     "start": "webpack-dev-server",
     "build": "webpack --mode=development",
-    "build:prod": "webpack --mode=production"
+    "build:prod": "webpack --mode=production",
+    "prepublishOnly": "tsc --build tsconfig.compile.json"
   },
   "keywords": [],
   "author": "",
@@ -35,7 +36,8 @@
     "style",
     "fx",
     "router",
-    "types"
+    "types",
+    "lib"
   ],
   "sideEffects": [
     "./main/svg-alias.ts"

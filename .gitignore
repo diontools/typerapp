@@ -84,3 +84,6 @@ package-lock.json
 
 # dist
 sample-dist/
+
+# lib
+lib/

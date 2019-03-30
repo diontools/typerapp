@@ -2,14 +2,14 @@
     "extends": "./tsconfig",
     "compilerOptions": {
         "noEmit": false,
-        "outDir": "./",
+        "outDir": "./lib",
         "declaration": true,
-        "declarationDir": "./",
+        "declarationDir": "./lib",
         "removeComments": true
     },
     "include": [
         "./tsconfig*",
-        "./src",
+        "./main",
         "./fx",
         "./helmet",
         "./router",
