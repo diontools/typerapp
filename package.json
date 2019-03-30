@@ -1,6 +1,6 @@
 {
   "name": "typerapp",
-  "version": "0.0.0-alpha.19",
+  "version": "0.0.0-alpha.20",
   "description": "",
   "main": "main/index.ts",
   "types": "main/index.ts",
