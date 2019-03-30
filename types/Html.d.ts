@@ -850,7 +850,7 @@ declare namespace TyperApp {
         formNoValidate?: boolean;
         formTarget?: string;
         name?: string;
-        type?: string;
+        type?: 'submit' | 'reset' | 'button';
         value?: string | string[] | number;
     }
 
