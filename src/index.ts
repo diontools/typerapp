@@ -582,11 +582,11 @@ export function actionCreator<S>() {
             return (state, params) => {
                 const r = action(state[name], params)
                 if (Array.isArray(r)) {
-                    const a: ActionResult<S> = [{ ...state, [name]: r[0] }]
+                    const a: ActionResult<S> = r[0] === state[name] ? [state] : [{ ...state, [name]: r[0] }]
                     for (let i = 1; i < r.length; i++) a.push(r[i] as Effect<any, any>)
                     return a
                 }
-                return { ...state, [name]: r }
+                return r === state[name] ? state : { ...state, [name]: r }
             }
         }
     }
