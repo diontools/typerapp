@@ -1,6 +1,6 @@
 // forked from https://github.com/morishitter/picostyle
 
-import { h, VNode } from '..'
+import { h, VNode } from 'typerapp'
 import * as CSS from 'csstype'
 
 let _id = 0

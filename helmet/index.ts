@@ -1,4 +1,4 @@
-import { h, VNode, VNodeType, convName } from '..'
+import { h, VNode, VNodeType, convName } from 'typerapp'
 
 function debug(args: any[]) {
     //console.log(...args)

@@ -1,4 +1,4 @@
-import { h, Dispatch, VNode, Subscription, Effect, Action } from '..'
+import { h, Dispatch, VNode, Subscription, Effect, Action } from 'typerapp'
 
 function debug(args: any[]) {
     //console.log(...args)
