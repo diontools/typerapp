@@ -84,3 +84,14 @@ package-lock.json
 
 # dist
 sample-dist/
+
+# compiled js
+*.js
+*.js.map
+
+# compiled d.ts
+fx/**/*.d.ts
+helmet/**/*.d.ts
+router/**/*.d.ts
+style/**/*.d.ts
+src/**/*.d.ts

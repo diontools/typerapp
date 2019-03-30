@@ -1,6 +1,6 @@
 // forked from https://github.com/jorgebucaran/hyperapp
 
-/// <reference path="Html.d.ts" />
+/// <reference path="../types/Html.d.ts" />
 
 const aliases: { [name: string]: string } = {
     acceptCharset: 'accept-charset',

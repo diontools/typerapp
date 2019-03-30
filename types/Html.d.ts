@@ -5,7 +5,7 @@
 /// <reference path="global.d.ts" />
 
 import * as CSS from 'csstype';
-import { VNode, Class } from '.'
+import { VNode, Class } from '../src'
 
 type NativeAnimationEvent = AnimationEvent;
 type NativeClipboardEvent = ClipboardEvent;

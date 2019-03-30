@@ -1,0 +1,19 @@
+{
+    "extends": "./tsconfig",
+    "compilerOptions": {
+        "noEmit": false,
+        "outDir": "./",
+        "declaration": true,
+        "declarationDir": "./",
+        "removeComments": true
+    },
+    "include": [
+        "./tsconfig*",
+        "./src",
+        "./fx",
+        "./helmet",
+        "./router",
+        "./style"
+    ],
+    "exclude": []
+}

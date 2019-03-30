@@ -6,7 +6,8 @@
   "scripts": {
     "start": "webpack-dev-server",
     "build": "webpack --mode=development",
-    "build:prod": "webpack --mode=production"
+    "build:prod": "webpack --mode=production",
+    "prepublishOnly": "tsc --build tsconfig.compile.json"
   },
   "keywords": [],
   "author": "",
