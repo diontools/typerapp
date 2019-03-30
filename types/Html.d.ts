@@ -1685,6 +1685,7 @@ declare global {
             feDiffuseLighting: TyperApp.SVGProps<SVGFEDiffuseLightingElement>;
             feDisplacementMap: TyperApp.SVGProps<SVGFEDisplacementMapElement>;
             feDistantLight: TyperApp.SVGProps<SVGFEDistantLightElement>;
+            feDropShadow: TyperApp.SVGProps<SVGFEDropShadowElement>;
             feFlood: TyperApp.SVGProps<SVGFEFloodElement>;
             feFuncA: TyperApp.SVGProps<SVGFEFuncAElement>;
             feFuncB: TyperApp.SVGProps<SVGFEFuncBElement>;
