@@ -195,6 +195,31 @@ app<State>({
 
 Typerapp [Html.d.ts](./types/Html.d.ts) forked from [React of DefinitelyTyped](https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/react).
 
+## Limitations
+
+TypeScript is NO check for exceed property on Action.
+
+```typescript
+const Act: Action<State> = state => ({
+    ...state,
+    typo: 1 // no error!
+})
+```
+
+Workaround:
+
+```typescript
+// type alias for Action/ActionResult
+type MyAction<P = Empty> = Action<State, P>
+type MyResult = ActionResult<State>
+
+// explicit return type
+const Act: MyAction = (state): MyResult => ({
+    ...state,
+    typo: 1 // error
+})
+```
+
 ## Extras
 
 Typerapp has extra features.
