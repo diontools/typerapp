@@ -1,6 +1,6 @@
 // Type definitions for Typerapp
 // forked from https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/react
-// synced: 2019/03/08
+// synced: 2019/03/30
 
 /// <reference path="global.d.ts" />
 
