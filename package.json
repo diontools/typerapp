@@ -1,7 +1,7 @@
 {
   "name": "typerapp",
-  "version": "0.0.0-alpha.27",
-  "description": "",
+  "version": "0.0.0-alpha.28",
+  "description": "Typerapp is type-safe Hyperapp V2.",
   "main": "lib/main/index.js",
   "types": "main/index.ts",
   "scripts": {
@@ -10,9 +10,17 @@
     "build:prod": "webpack --mode=production",
     "prepublishOnly": "tsc --build tsconfig.compile.json"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/diontools/typerapp.git"
+  },
   "keywords": [],
-  "author": "",
+  "author": "diontools",
   "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/diontools/typerapp/issues"
+  },
+  "homepage": "https://github.com/diontools/typerapp#readme",
   "dependencies": {
     "csstype": "^2.6.3",
     "typescript": "^3.3.4000"
