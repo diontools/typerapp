@@ -1,3 +1,5 @@
+[![npm version](https://badge.fury.io/js/typerapp.svg)](https://www.npmjs.com/package/typerapp)
+
 # Typerapp
 
 Typerapp is type-safe [Hyperapp V2](https://github.com/jorgebucaran/hyperapp).
@@ -220,6 +222,8 @@ const Act: MyAction = (state): MyResult => ({
 })
 ```
 
+For truly solution, please vote [Exact Types](https://github.com/Microsoft/TypeScript/issues/12936).
+
 ## Extras
 
 Typerapp has extra features.
@@ -377,5 +381,29 @@ app<State>({
         </Wrapper>
     </div>
 })
+```
+
+### SVG hyphened attributes alias
+
+TypeScript is no check for hyphened attributes on TSX.
+
+Please import `typerapp/main/svg-alias` for type checkable camel-case attributes.
+
+In the below, `strokeWidth` and `strokeDasharray` is converted to `stroke-width` and `stroke-dasharray`.
+
+```tsx
+import "typerapp/main/svg-alias"
+
+<svg x="0px" y="0px" width="200px" height="3" viewBox="0 0 200 1">
+    <line
+        x1="0"
+        y1="0.5"
+        x2="200px"
+        y2="0.5"
+        stroke="skyblue"
+        strokeWidth={3}
+        strokeDasharray={5}
+    />
+</svg>
 ```
 
