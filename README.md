@@ -45,7 +45,7 @@ app({
 Typerapp:
 
 ```tsx
-app({
+app<State>({
     view: (state, dispatch) => ...
 })
 ```
@@ -72,7 +72,7 @@ Typerapp:
 ```tsx
 const Input: Action<State, string> = (state, value) => ({ ...state, value })
 
-app({
+app<State>({
     view: (state, dispatch) => <div>
         <input
             value={state.value}
@@ -184,7 +184,7 @@ export function timer<S, P>(action: TimerProps<S, P>['action'], props: { interva
 Use:
 
 ```typescript
-app({
+app<State>({
     subscriptions: state => [
         timer(Increment, { interval: 1000 })
     ]
@@ -231,7 +231,7 @@ export const view: View<State> = ({ part: state }, dispatch) => <div>
 ```tsx
 import { Helmet } from 'typerapp/helment'
 
-app({
+app<State>({
     view: (state, dispatch) => <div>
         <Helmet>
             <title>{state.title}</title>
@@ -247,7 +247,7 @@ const renderHead = (props: { title: string }) => <Helmet>
     <title>{props.title}</title>
 </Helmet>
 
-app({
+app<State>({
     view: (state, dispatch) => <div>
         <Lazy key="head" render={renderHead} title={state.title} />
     </div>
@@ -289,7 +289,7 @@ const router = createRouter<State, RouteProps>({
     matched: (routing, dispatch) => dispatch(SetRoute, routing),
 })
 
-app({
+app<State>({
     view: (state, dispatch) => <div>
         <div><Link to="/">Home</Link></div>
         <div><Link to="/Counter/10">Count10</Link></div>
@@ -328,7 +328,7 @@ const StyledText = style<{ color: string }>('div')(props => ({
     },
 }))
 
-app({
+app<State>({
     view: (state, dispatch) => <div>
         <Wrapper>
             <StyledText color="green">text</StyledText>
