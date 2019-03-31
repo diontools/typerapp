@@ -226,6 +226,23 @@ export const view: View<State> = ({ part: state }, dispatch) => <div>
 </div>
 ```
 
+### ActionParamOf
+
+`ActionParamOf` type is getting 2nd type parameter of Action for Effect/Subscription Constructor.
+
+```typescript
+import { ActionParamOf } from 'typerapp'
+import { httpJson } from 'typerapp/fx'
+
+// { json: unknown }
+type ParamType = ActionParamOf<typeof httpJson>
+
+const JsonReceived: Action<State, ParamType> = (state, params) => ({
+    ...state,
+    text: JSON.stringify(params.json)
+})
+```
+
 ### Helmet
 
 ```tsx
@@ -240,7 +257,7 @@ app<State>({
 })
 ```
 
-Improve performance by Lazy:
+Recommend performance improvement with Lazy:
 
 ```tsx
 const renderHead = (props: { title: string }) => <Helmet>
