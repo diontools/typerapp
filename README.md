@@ -12,6 +12,11 @@ Sample: [![Edit typerapp](https://codesandbox.io/static/img/play-codesandbox.svg
 npm install typerapp
 ```
 
+> Note:
+> Typerapp uses TypeScript source file in node module.
+> If you use Webpack ts-loader, enable [allowTsInNodeModules](https://github.com/TypeStrong/ts-loader#allowtsinnodemodules-boolean-defaultfalse) option, and include `node_modules/typerapp` of tsconfig.json.
+> It is not necessary for Parcel.
+
 ## Modified points from Hyperapp
 
 1. Remove Action `data` argument
