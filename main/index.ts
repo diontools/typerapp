@@ -507,6 +507,12 @@ export type EffectAction<S, P, R = undefined> =
     ? Action<S, Empty> | [Action<S, P>, P]
     : Action<S, R> | [Action<S, P & R>, P]
 
+// extract property types
+type PropertyOf<T> =
+    T extends any[] ? T :
+    T extends Function ? T :
+    T extends { [P in keyof T]: infer R } ? R :
+    T
 // extract from union
 type Filter<T, U> = T extends U ? T : never
 // tuple to union
@@ -515,7 +521,17 @@ type ElementOf<T> = T extends (infer E)[] ? E : T
 export type ActionParamType<T> = T extends Action<any, infer R> ? R : never
 
 /** Extract action parameter type from Effect Constructor */
-export type ActionParamOf<T extends (...args: any[]) => any> = ActionParamType<Filter<ElementOf<Parameters<T>>, Action<any, any>>>
+export type ActionParamOf<T extends (...args: any[]) => any> =
+    ActionParamType<
+        Filter<
+            PropertyOf<
+                ElementOf<
+                    Parameters<T>
+                >
+            >,
+            Action<any, any>
+        >
+    >
 
 export type Subscription<S, P = Empty> = [(props: P, dispatch: Dispatch<S>) => () => void, P]
 
