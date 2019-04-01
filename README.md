@@ -262,7 +262,7 @@ export const view: View<State> = ({ part: state }, dispatch) => <div>
 
 ### ActionParamOf
 
-`ActionParamOf` type is getting 2nd type parameter of Action for Effect/Subscription Constructor.
+`ActionParamOf` type gets 2nd type parameter of Action for Effect/Subscription Constructor.
 
 ```typescript
 import { ActionParamOf } from 'typerapp'
@@ -278,6 +278,8 @@ const JsonReceived: Action<State, ParamType> = (state, params) => ({
 ```
 
 ### Helmet
+
+`Helmet` renders to the head element of DOM.
 
 ```tsx
 import { Helmet } from 'typerapp/helment'
@@ -306,6 +308,8 @@ app<State>({
 ```
 
 ### Router
+
+Typerapp Router is routing Subscription. Router syncs URL to the state by [History](https://developer.mozilla.org/ja/docs/Web/API/History) API.
 
 ```tsx
 import { createRouter, Link, RoutingInfo, Redirect } from 'typerapp/router'
