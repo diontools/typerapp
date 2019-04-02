@@ -500,8 +500,6 @@ export type Empty = { ___dummy: never }
 export type ActionResult<S> = S | [S, ...Effect<any, any>[]]
 export type Action<S, P = Empty> = (state: S, params: P) => ActionResult<S>
 
-export type Effect<S, P = Empty> = [(props: P, dispatch: Dispatch<S>) => void, P]
-
 export type EffectAction<S, P, R = undefined> =
     R extends undefined
     ? Action<S, Empty> | [Action<S, P>, P]
@@ -532,6 +530,8 @@ export type ActionParamOf<T extends (...args: any[]) => any> =
             Action<any, any>
         >
     >
+
+export type Effect<S, P = Empty> = [(props: P, dispatch: Dispatch<S>) => void, P]
 
 export type Subscription<S, P = Empty> = [(props: P, dispatch: Dispatch<S>) => () => void, P]
 
