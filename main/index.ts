@@ -454,7 +454,7 @@ export var app = function <S>(props: AppProps<S>) {
     var sub: any[] = []
 
     var eventCb: EventCb = function (event) {
-        (event.currentTarget as any).events[event.type](event)
+        (event.currentTarget as Element).events![event.type](event)
     }
 
     var setState = function (newState: S) {
