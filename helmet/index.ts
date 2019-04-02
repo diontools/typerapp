@@ -1,4 +1,4 @@
-import { h, VNode, VNodeType, convName } from 'typerapp'
+import { h, VNode, convName } from 'typerapp'
 
 function debug(args: any[]) {
     //console.log(...args)
@@ -9,12 +9,12 @@ const id = 'h-n'
 export function Helmet(props: {}, children: VNode[]) {
     updateNodes(children, document.head, false)
     const n = h('', null)
-    n.type = VNodeType.TEXT // force TEXT VNode
+    n.type = 3 // force TEXT VNode
     return n
 }
 
 function createElement(node: VNode): Element | Text {
-    if (node.type === VNodeType.TEXT) {
+    if (node.type === 3) {
         return document.createTextNode(node.name)
     } else {
         const element = document.createElement(node.name)
@@ -74,7 +74,7 @@ function updateNodes(children: VNode[], parentNode: Node, isChild: boolean) {
             const childNode = childNodes[i]
             if (childNode.nodeType === childNode.TEXT_NODE) {
                 const childText = <Text>childNode
-                if (vNode.type === VNodeType.TEXT) {
+                if (vNode.type === 3) {
                     // update text
                     if (vNode.name !== childText.textContent) {
                         debug(['update text', vNode])
