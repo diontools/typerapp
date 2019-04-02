@@ -518,7 +518,7 @@ type Filter<T, U> = T extends U ? T : never
 // tuple to union
 type ElementOf<T> = T extends (infer E)[] ? E : T
 
-export type ActionParamType<T> = T extends Action<any, infer R> ? R : never
+type ActionParamType<T> = T extends Action<any, infer R> ? R : never
 
 /** Extract action parameter type from Effect Constructor */
 export type ActionParamOf<T extends (...args: any[]) => any> =
@@ -535,11 +535,6 @@ export type ActionParamOf<T extends (...args: any[]) => any> =
 
 export type Subscription<S, P = Empty> = [(props: P, dispatch: Dispatch<S>) => () => void, P]
 
-export type SubscriptionType = Subscription<any, any> | boolean
-
-export type SubscriptionsResult =
-    | SubscriptionType[]
-
 export type Dispatch<S> = {
     (action: Action<S, Empty>): void
     <P>(action: Action<S, P>, params: P): void
@@ -553,7 +548,7 @@ export type View<S> = (state: S, dispatch: Dispatch<S>) => VNode
 export type AppProps<S> = {
     init: Action<S> | ActionResult<S>,
     view?: View<S>,
-    subscriptions?: (state: S) => SubscriptionsResult,
+    subscriptions?: (state: S) => (Subscription<S, any> | boolean)[],
     container: Element
 }
 
