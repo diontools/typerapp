@@ -25,7 +25,7 @@ npm install typerapp
 
 ### Remove Action `data` argument
 
-Typerapp Action is only two arguments.
+Typerapp Action has only two arguments.
 
 Hyperapp:
 
@@ -262,7 +262,7 @@ export const view: View<State> = ({ part: state }, dispatch) => <div>
 
 ### ActionParamOf
 
-`ActionParamOf` type gets 2nd type parameter of Action for Effect/Subscription Constructor.
+`ActionParamOf` type gets parameter type of Action from Effect/Subscription Constructor.
 
 ```typescript
 import { ActionParamOf } from 'typerapp'
