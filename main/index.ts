@@ -377,7 +377,7 @@ var getNode = function (newNode: VNode, node?: VNode) {
         : newNode
 }
 
-var createVNode = function (name: string, props: VNodeProps, children: VNode[], element: Element | undefined, key: string | null, type: VNodeType): VNode {
+var createVNode = function (name: string, props: VNodeProps, children: VNode[], element: Element | undefined, key: string | null, type: number): VNode {
     return {
         name: name,
         props: props,
@@ -554,13 +554,6 @@ export type AppProps<S> = {
 
 export type Children = VNode | string | number | null
 
-export enum VNodeType {
-    DEFAULT = 0,
-    RECYCLED = 1,
-    LAZY = 2,
-    TEXT = 3,
-}
-
 export type VNodeProps = { [key: string]: any }
 
 export interface VNode<Props extends VNodeProps = VNodeProps> {
@@ -569,7 +562,7 @@ export interface VNode<Props extends VNodeProps = VNodeProps> {
     children: Array<VNode>
     element: Element | Text,
     key: string | null,
-    type: VNodeType,
+    type: number,
     lazy?: any
     render?: () => VNode
 }
