@@ -2,7 +2,7 @@
 
 # Typerapp
 
-Typerapp is type-safe [Hyperapp V2](https://github.com/jorgebucaran/hyperapp).
+Typerapp is type-safe [Hyperapp V2](https://github.com/jorgebucaran/hyperapp) + α. It's written in TypeScript.
 
 Sample: [![Edit typerapp-sample](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/github/diontools/typerapp-sample/tree/master/?fontsize=14&module=%2Fsrc%2Findex.tsx)
 
