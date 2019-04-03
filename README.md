@@ -21,11 +21,11 @@ npm install typerapp
 
 ## Modified points from Hyperapp
 
-1. Remove Action `data` argument
+1. Remove `data` argument from Action
 2. Add `dispatch` to `view` arguments
 3. Pure DOM Events
 
-### Remove Action `data` argument
+### Remove `data` argument from Action
 
 Typerapp Action has only two arguments.
 
