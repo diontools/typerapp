@@ -422,3 +422,26 @@ import "typerapp/main/svg-alias"
 </svg>
 ```
 
+### mergeAction
+
+In Typerapp, if your Effect/Subscription returns a value by Action, you must merge a return value into Action parameter, because Typerapp has not `data` of Action.
+
+In that case, you can use `mergeAction` function.
+
+```typescript
+import { EffectAction, Dispatch, Effect } from "typerapp"
+import { mergeAction } from 'typerapp/fx/utils'
+
+export type RunnerProps<S, P> = {
+    action: EffectAction<S, P, { returnValue: number }>
+}
+
+const effectRunner = <S, P>(props: RunnerProps<S, P>, dispatch: Dispatch<S>) => {
+    dispatch(mergeAction(props.action, { returnValue: 1234 }))
+}
+
+export function effect<S, P>(action: RunnerProps<S, P>["action"]): Effect<S, RunnerProps<S, P>> {
+  return [effectRunner, { action }]
+}
+```
+
