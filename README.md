@@ -61,6 +61,10 @@ app<State>({
 
 ### Pure DOM Events
 
+In Typerapp, specify a function that takes [Event](https://developer.mozilla.org/ja/docs/Web/API/Event) as an argument to VDOM event.
+
+Then, call the Action using the `dispatch`.
+
 Hyperapp:
 
 ```tsx
@@ -311,7 +315,7 @@ app<State>({
 
 ### Router
 
-Typerapp Router is routing Subscription. Router syncs URL to the state by [History](https://developer.mozilla.org/ja/docs/Web/API/History) API.
+Typerapp Router is url-based routing Subscription. Router syncs URL to the state by [History](https://developer.mozilla.org/ja/docs/Web/API/History) API.
 
 ```tsx
 import { createRouter, Link, RoutingInfo, Redirect } from 'typerapp/router'
@@ -362,7 +366,7 @@ app<State>({
 
 ### CSS-in-JS
 
-Typerapp style forked from [Picostyle](https://github.com/morishitter/picostyle).
+Typerapp `style` forked from [Picostyle](https://github.com/morishitter/picostyle).
 
 ```tsx
 import { style } from 'typerapp/style'
