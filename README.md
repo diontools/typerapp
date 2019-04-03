@@ -4,9 +4,9 @@
 
 Typerapp is type-safe [Hyperapp V2](https://github.com/jorgebucaran/hyperapp).
 
-Sample: [![Edit typerapp](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/loo59m2nm?fontsize=14&module=%2Fsrc%2Findex.tsx)
+Sample: [![Edit typerapp-sample](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/github/diontools/typerapp-sample/tree/master/?fontsize=14&module=%2Fsrc%2Findex.tsx)
 
-Minimum sample: [![Edit typerapp minimum sample](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/8y7x072j2j?fontsize=14&module=%2Fsrc%2Findex.tsx)
+Minimum sample: [![Edit typerapp-minimum-sample](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/github/diontools/typerapp-minimum-sample/tree/master/?fontsize=14&module=%2Fsrc%2Findex.tsx)
 
 ## Install
 
