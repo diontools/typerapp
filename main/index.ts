@@ -137,6 +137,10 @@ var createElement = function (node: VNode, eventCb: EventCb, isSvg?: boolean) {
                 : document.createElement(node.name)
     var props = node.props
 
+    for (var k in props) {
+        updateProperty(<Element>element, k, null, props[k], eventCb, isSvg)
+    }
+
     for (var i = 0, len = node.children.length; i < len; i++) {
         element.appendChild(
             createElement(
@@ -147,17 +151,15 @@ var createElement = function (node: VNode, eventCb: EventCb, isSvg?: boolean) {
         )
     }
 
-    for (var k in props) {
-        updateProperty(<Element>element, k, null, props[k], eventCb, isSvg)
-    }
-
     return (node.element = element)
 }
 
 var updateElement = function (element: Element, props: VNodeProps, newProps: VNodeProps, eventCb: EventCb, isSvg?: boolean) {
     for (var k in merge(props, newProps)) {
         if (
-            (k === "value" || k === "checked" ? (element as any)[k] : props[k]) !== newProps[k]
+            (k === "value" || k === "selected" || k === "checked"
+              ? (element as any)[k]
+              : props[k]) !== newProps[k]
         ) {
             updateProperty(element, k, props[k], newProps[k], eventCb, isSvg)
         }
