@@ -23,13 +23,7 @@ var EMPTY_ARRAY: any[] = []
 
 var map = EMPTY_ARRAY.map
 var isArray = Array.isArray
-
-var defer =
-    typeof Promise === "function"
-        ? function (cb: any) {
-            Promise.resolve().then(cb)
-        }
-        : setTimeout
+var defer = requestAnimationFrame || setTimeout
 
 var merge = function <T1, T2>(a: T1, b: T2): T1 & T2 {
     var out = <any>{}
