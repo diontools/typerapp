@@ -1,6 +1,6 @@
 // Type definitions for Typerapp
 // forked from https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/react
-// synced: 2019/03/30
+// synced: 2019/04/12
 
 /// <reference path="global.d.ts" />
 
@@ -353,6 +353,8 @@ declare namespace TyperApp {
         onWaitingCapture?: ReactEventHandler<T>;
 
         // MouseEvents
+        onAuxClick?: MouseEventHandler<T>;
+        onAuxClickCapture?: MouseEventHandler<T>;
         onClick?: MouseEventHandler<T>;
         onClickCapture?: MouseEventHandler<T>;
         onContextMenu?: MouseEventHandler<T>;
