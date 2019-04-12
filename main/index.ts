@@ -25,6 +25,25 @@ var map = EMPTY_ARRAY.map
 var isArray = Array.isArray
 var defer = requestAnimationFrame || setTimeout
 
+var createClass = function (obj: any): string {
+    var out = ""
+    var tmp: string = typeof obj
+
+    if (tmp === "string" || tmp === "number") return obj
+
+    if (isArray(obj) && obj.length > 0) {
+        for (let i = 0; i < obj.length; i++) {
+            if ((tmp = createClass(obj[i])) !== "") out += (out && " ") + tmp
+        }
+    } else {
+        for (let i in obj) {
+            if (obj[i]) out += (out && " ") + i
+        }
+    }
+
+    return out
+}
+
 var merge = function <T1, T2>(a: T1, b: T2): T1 & T2 {
     var out = <any>{}
 
@@ -68,25 +87,6 @@ var patchSub = function (sub: any[], newSub: any[], dispatch: any) {
                 : a && a[2]()
         )
     }
-    return out
-}
-
-var createClass = function (obj: any): string {
-    var out = ""
-    var tmp: string = typeof obj
-
-    if (tmp === "string" || tmp === "number") return obj
-
-    if (isArray(obj) && obj.length > 0) {
-        for (var i = 0; i < obj.length; i++) {
-            if ((tmp = createClass(obj[i])) !== "") out += (out && " ") + tmp
-        }
-    } else {
-        for (let i in obj) {
-            if (obj[i]) out += (out && " ") + i
-        }
-    }
-
     return out
 }
 
@@ -386,21 +386,17 @@ var createTextVNode = function (text: string, element?: Element) {
     return createVNode(text, EMPTY_OBJECT, EMPTY_ARRAY, element, null, TEXT_NODE)
 }
 
-var recycleChild = function (element: Element): VNode {
+var recycleElement = function (element: Element): VNode {
     return element.nodeType === TEXT_NODE
         ? createTextVNode(element.nodeValue!, element)
-        : recycleElement(element)
-}
-
-var recycleElement = function (element: Element) {
-    return createVNode(
-        element.nodeName.toLowerCase(),
-        EMPTY_OBJECT,
-        map.call(element.childNodes, recycleChild) as VNode[],
-        element,
-        null,
-        RECYCLED_NODE
-    )
+        : createVNode(
+            element.nodeName.toLowerCase(),
+            EMPTY_OBJECT,
+            map.call(element.childNodes, recycleElement) as VNode[],
+            element,
+            null,
+            RECYCLED_NODE
+        )
 }
 
 export var Lazy = function <P extends { key: string, render: (props: P) => VNode }>(props: P): LazyVNode<P> {
