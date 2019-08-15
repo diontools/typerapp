@@ -1,4 +1,4 @@
-import { h, app, Action, Lazy, Dispatch, ActionParamOf } from 'typerapp'
+import { h, app, Action, Lazy, Dispatch } from 'typerapp'
 import { Helmet } from 'typerapp/helmet'
 import { style } from 'typerapp/style'
 import { timer, httpText, execute, delay } from 'typerapp/fx';
@@ -26,7 +26,7 @@ const ToggleAuto: Action<State> = state => ({
 
 const Input: Action<State, string> = (state, value) => ({ ...state, input: value })
 
-const OnTextResponse: Action<State, ActionParamOf<typeof httpText>> = (state, params) => ({
+const OnTextResponse: Action<State, { text: string }> = (state, params) => ({
     ...state,
     text: params.text
 })
@@ -82,7 +82,7 @@ const Counter = (state: State, dispatch: Dispatch<State>, amount: number = 1) =>
     <button onClick={ev => dispatch(ToggleAuto)}>auto:{state.auto ? 'true' : 'false'}</button>
     <div style={{ fontSize: '20px' }}>value: {state.value}</div>
     <div class={'lazy-view'}>
-        <Lazy key='lazy' render={lazyView} auto={state.auto} />
+        <Lazy key='lazy' view={lazyView} auto={state.auto} />
     </div>
 </div>
 
@@ -104,7 +104,7 @@ const router = createRouter<State, RouteProps>({
         path: '/fetch',
         view: (state, dispatch, params) => <div>
             <h2>Fetch</h2>
-            <button onClick={ev => dispatch([state, httpText(OnTextResponse, '/')])}>http requst</button>
+            <button onClick={ev => dispatch([state, httpText([OnTextResponse, p => p], '/')])}>http requst</button>
             <button onClick={ev => dispatch({ ...state, text: '' })}>clear text</button>
             <div>text: {state.text}</div>
         </div>,
@@ -157,7 +157,7 @@ app<State>({
     },
     view: (state, dispatch) => (
         <div>
-            <Lazy key="head" render={renderHead} title={state.routing ? state.routing.route.title(state, state.routing.params) : '404'} />
+            <Lazy key="head" view={renderHead} title={state.routing ? state.routing.route.title(state, state.routing.params) : '404'} />
 
             <ul>
                 <li><Link to="/">home</Link></li>
@@ -178,5 +178,5 @@ app<State>({
         router,
         state.auto && timer([Add, { amount: 1 }], { interval: 500 }),
     ],
-    container: document.body,
+    node: document.body,
 })

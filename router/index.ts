@@ -7,6 +7,7 @@ function debug(args: any[]) {
 export interface RouterProps<S, P> {
     routes: Route<S, P>[],
     matched: (routing: RoutingInfo<S, P> | undefined, dispatch: Dispatch<S>) => void,
+    _init?: boolean,
 }
 
 export type PathSeg = string | {
@@ -30,7 +31,7 @@ export type RoutingInfo<S, P> = {
     params: RouteParams
 }
 
-const runner = <S, P>(props: RouterProps<S, P>, dispatch: Dispatch<S>) => {
+const runner = <S, P>(dispatch: Dispatch<S>, props: RouterProps<S, P>) => {
     debug(['routing'])
     function onLocationChanged() {
         const pathname = window.location.pathname
@@ -58,7 +59,10 @@ const runner = <S, P>(props: RouterProps<S, P>, dispatch: Dispatch<S>) => {
     }
     window.addEventListener("popstate", onLocationChanged)
 
-    onLocationChanged()
+    if (!props._init) {
+        props._init = true
+        onLocationChanged()
+    }
 
     return () => {
         debug(['unrouting'])
@@ -118,11 +122,11 @@ function replaceHistory(to: string) {
 }
 
 export function PushHistory<S>(to: string): Effect<S, string> {
-    return [<S, P>(to: string, dispatch: Dispatch<S>) => pushHistory(to), to]
+    return [<S, P>(dispatch: Dispatch<S>, to: string) => pushHistory(to), to]
 }
 
 export function ReplaceHistory<S>(to: string): Effect<S, string> {
-    return [<S, P>(to: string, dispatch: Dispatch<S>) => replaceHistory(to), to]
+    return [<S, P>(dispatch: Dispatch<S>, to: string) => replaceHistory(to), to]
 }
 
 export interface LinkProps<S> {

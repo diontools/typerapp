@@ -21,11 +21,11 @@ npm install typerapp
 
 ## Modified points from Hyperapp
 
-1. Remove `data` argument from Action
+1. ~~Remove `data` argument from Action~~
 2. Add `dispatch` to `view` arguments
 3. Pure DOM Events
 
-### Remove `data` argument from Action
+### ~~Remove `data` argument from Action~~
 
 Typerapp Action has only two arguments.
 
@@ -34,6 +34,8 @@ Hyperapp:
 ```js
 const Act = (state, { value }, data) => ({...})
 ```
+
+**Obsoluted: Currently Hyperapp V2 does NOT have a `data` argument.**
 
 Typerapp:
 
@@ -123,10 +125,12 @@ const Add: Action<State, { amount: number }> = (state, params) => ({
 
 ### Effects
 
+**Note: Change signature (move `dispatch` to first argument)**
+
 Type:
 
 ```typescript
-export type Effect<S, P = Empty> = [(props: P, dispatch: Dispatch<S>) => void, P]
+export type Effect<S, P = Empty> = [(dispatch: Dispatch<S>, props: P) => void, P]
 ```
 
 Define Effect:
@@ -139,7 +143,7 @@ export type DelayProps<S, P> = {
 }
 
 // Delay Effect Runner
-const DelayRunner = <S, P>(props: DelayProps<S, P>, dispatch: Dispatch<S>) => {
+const DelayRunner = <S, P>(dispatch: Dispatch<S>, props: DelayProps<S, P>) => {
     setTimeout(() => dispatch(props.action), props.duration)
 }
 
@@ -167,10 +171,12 @@ const DelayAdd: Action<State, { amount: number }> = (state, params) => [
 
 ### Subscriptions
 
+**Note: Change signature (move `dispatch` to first argument)**
+
 Type:
 
 ```typescript
-export type Subscription<S, P = Empty> = [(props: P, dispatch: Dispatch<S>) => () => void, P]
+export type Subscription<S, P = Empty> = [(dispatch: Dispatch<S>, props: P) => () => void, P]
 ```
 
 Define Subscription:
@@ -183,7 +189,7 @@ export type TimerProps<S, P> = {
 }
 
 // Timer Subscription Runner
-const timerRunner = <S, P>(props: TimerProps<S, P>, dispatch: Dispatch<S>) => {
+const timerRunner = <S, P>(dispatch: Dispatch<S>, props: TimerProps<S, P>) => {
     const id = setInterval(() => dispatch(props.action), props.interval)
     return () => clearInterval(id)
 }
@@ -266,9 +272,11 @@ export const view: View<State> = ({ part: state }, dispatch) => <div>
 </div>
 ```
 
-### ActionParamOf
+### ~~ActionParamOf~~
 
-`ActionParamOf` type gets parameter type of Action from Effect/Subscription Constructor.
+**Obsoluted: Payload Creator instead**
+
+~~`ActionParamOf` type gets parameter type of Action from Effect/Subscription Constructor.~~
 
 ```typescript
 import { ActionParamOf } from 'typerapp'
@@ -422,11 +430,13 @@ import "typerapp/main/svg-alias"
 </svg>
 ```
 
-### mergeAction
+### ~~mergeAction~~
 
-In Typerapp, if your Effect/Subscription returns a value by Action, you must merge a return value into Action parameter, because Typerapp has not `data` of Action.
+**Obsoluted: Payload Creator instead**
 
-In that case, you can use `mergeAction` function.
+~~In Typerapp, if your Effect/Subscription returns a value by Action, you must merge a return value into Action parameter, because Typerapp has not `data` of Action.~~
+
+~~In that case, you can use `mergeAction` function.~~
 
 ```typescript
 import { EffectAction, Dispatch, Effect } from "typerapp"
