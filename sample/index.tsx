@@ -6,15 +6,15 @@ import { createRouter, Link, RoutingInfo, Redirect } from 'typerapp/router'
 import { State, RouteProps } from './states'
 import * as part from './part'
 
-const Add: Action<State, { amount: number }> = (state, params) => ({
+const Add: Action<State, { amount: number }> = (state, payload) => ({
     ...state,
-    value: state.value + params.amount,
+    value: state.value + payload.amount,
 })
 
 
-const AddWithDelay: Action<State, { duration: number, amount: number }> = (state, params) => [
+const AddWithDelay: Action<State, { duration: number, amount: number }> = (state, payload) => [
     state,
-    delay([Add, { amount: params.amount }], { duration: params.duration }),
+    delay([Add, { amount: payload.amount }], { duration: payload.duration }),
 ]
 
 
@@ -26,14 +26,14 @@ const ToggleAuto: Action<State> = state => ({
 
 const Input: Action<State, string> = (state, value) => ({ ...state, input: value })
 
-const OnTextResponse: Action<State, { text: string }> = (state, params) => ({
+const OnTextResponse: Action<State, { text: string }> = (state, payload) => ({
     ...state,
-    text: params.text
+    text: payload.text
 })
 
 const Act1: Action<State> = state => ({ ...state, value: state.value + 1 })
 const Act2: Action<State> = state => ({ ...state, value: state.value + 2 })
-const Act3: Action<State, { newValue: number }> = (state, params) => ({ ...state, value: params.newValue })
+const Act3: Action<State, { newValue: number }> = (state, payload) => ({ ...state, value: payload.newValue })
 
 execute<State>(dispatch => {
     dispatch(Act1)

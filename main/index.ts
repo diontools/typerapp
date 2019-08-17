@@ -508,14 +508,14 @@ export var app = function <S>(props: AppProps<S>) {
 type EventListener = (ev: Event) => void
 type VNodeWithKey = { [key: string]: VNode | boolean }
 
-/** Dummy param type of Action */
+/** Dummy payload type of Action */
 export type Empty = { ___dummy: never }
 
 /** Return type of Action */
 export type ActionResult<S> = S | [S, ...Effect<any, any>[]]
 
 /** Action type */
-export type Action<S, P = Empty> = (state: S, params: P) => ActionResult<S>
+export type Action<S, P = Empty> = (state: S, payload: P) => ActionResult<S>
 
 /** Action type for Effect */
 export type EffectAction<S, P, EP = undefined> =
@@ -534,12 +534,26 @@ export type Subscriptions<S> = Subscription<S, any> | boolean | (Subscription<S,
 
 /** dispatch function type */
 export type Dispatch<S> = {
+    /** Dispatch Action without payload */
     (action: Action<S, Empty>): void
-    <P>(action: Action<S, P>, params: P): void
-    <P>(actionWithParams: [Action<S, P>, P]): void
+
+    /** Dispatch Action with payload */
+    <P>(action: Action<S, P>, payload: P): void
+
+    /** Dispatch Action with payload (tuple style) */
+    <P>(actionWithPayload: [Action<S, P>, P]): void
+
+    /** Dispatch ActionResult */
     (result: ActionResult<S>): void
+
+    /** Dispatch Action for Effect */
     <P, EP>(effectAction: EffectAction<S, P, EP>, effectPayload: EP): void
-    <P>(all: Action<S, Empty> | [Action<S, P>, P] | ActionResult<S>): void
+
+    /** Dispatch Action for Effect without Payload Creator */
+    <P>(effectAction: EffectAction<S, P>): void
+
+    /** Dispatch for init */
+    (init: Action<S> | ActionResult<S>): void
 }
 
 /** Return type of view function on app */
@@ -596,8 +610,8 @@ export type Class = string | number | ClassObject | ClassArray
 export function actionCreator<S>() {
     return <N extends keyof S>(name: N): (<P1 = {}, P2 = {}>(action: Action<S[N], P1 & P2>) => Action<S, P1 & P2>) => {
         return (action) => {
-            return (state, params) => {
-                const r = action(state[name], params)
+            return (state, payload) => {
+                const r = action(state[name], payload)
                 if (Array.isArray(r)) {
                     const a: ActionResult<S> = r[0] === state[name] ? [state] : [{ ...state, [name]: r[0] }]
                     for (let i = 1; i < r.length; i++) a.push(r[i] as Effect<any, any>)
