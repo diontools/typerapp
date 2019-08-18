@@ -546,6 +546,12 @@ export type Dispatch<S> = {
     /** Dispatch ActionResult */
     (result: ActionResult<S>): void
 
+    /**
+     * WARNING: This Action NOT used payload
+     * @deprecated
+     */
+    <EP>(effectAction: Action<S>, effectPayload: EP): void
+
     /** Dispatch Action for Effect */
     <P, EP>(effectAction: EffectAction<S, P, EP>, effectPayload: EP): void
 
