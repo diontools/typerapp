@@ -521,7 +521,7 @@ export type Action<S, P = Empty> = (state: S, payload: P) => ActionResult<S>
 export type EffectAction<S, P, EP = undefined> =
     EP extends undefined
     ? Action<S, Empty> | [Action<S, P>, P]
-    : Action<S, Empty> | [Action<S, P>, P] | [Action<S, P>, (effectPayload: EP) => P]
+    : Action<S, Empty> | [Action<S, P>, P] | Action<S, EP> | [Action<S, P>, (effectPayload: EP) => P]
 
 /** Effect object type */
 export type Effect<S, P = Empty> = [(dispatch: Dispatch<S>, props: P) => void, P]

@@ -132,6 +132,20 @@ http(HttpParamedAction, '/')
 http(null, '/')
 
 
+const HttpResponseAction: Action<State, { response: Response }> = (state, payload) => ({
+    ...state,
+    value: payload.response.status
+})
+
+// OK
+http(HttpResponseAction, '/')
+http([HttpResponseAction, p => p], '/')
+http([HttpResponseAction, { response: {} as Response }], '/')
+
+// NG
+http([HttpResponseAction], '/')
+http([HttpResponseAction, undefined], '/')
+
 
 const partAction = actionCreator<State>()('part')
 
