@@ -1,6 +1,6 @@
 // Type definitions for Typerapp
 // forked from https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/react
-// synced: 2019/05/21
+// synced: 2019/05/29
 
 /// <reference path="global.d.ts" />
 
@@ -1476,6 +1476,7 @@ declare global {
             summary: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLElement>, HTMLElement>;
             sup: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLElement>, HTMLElement>;
             table: TyperApp.DetailedHTMLProps<TyperApp.TableHTMLAttributes<HTMLTableElement>, HTMLTableElement>;
+            template: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLTemplateElement>, HTMLTemplateElement>;
             tbody: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLTableSectionElement>, HTMLTableSectionElement>;
             td: TyperApp.DetailedHTMLProps<TyperApp.TdHTMLAttributes<HTMLTableDataCellElement>, HTMLTableDataCellElement>;
             textarea: TyperApp.DetailedHTMLProps<TyperApp.TextareaHTMLAttributes<HTMLTextAreaElement>, HTMLTextAreaElement>;
