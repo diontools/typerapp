@@ -614,7 +614,7 @@ export type Class = string | number | ClassObject | ClassArray
 
 /** Modularization function */
 export function actionCreator<S>() {
-    return <N extends keyof S>(name: N): (<P1 = {}, P2 = {}>(action: Action<S[N], P1 & P2>) => Action<S, P1 & P2>) => {
+    return <N extends keyof S>(name: N): (<P = Empty>(action: Action<S[N], P>) => Action<S, P>) => {
         return (action) => {
             return (state, payload) => {
                 const r = action(state[name], payload)
