@@ -1,6 +1,6 @@
 // Type definitions for Typerapp
 // forked from https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/react
-// synced: 2019/07/04
+// synced: 2019/08/01
 
 /// <reference path="global.d.ts" />
 
@@ -738,6 +738,10 @@ declare namespace TyperApp {
         span?: number;
     }
 
+    interface DataHTMLAttributes<T> extends HTMLAttributes<T> {
+        value?: string | string[] | number;
+    }
+
     interface DetailsHTMLAttributes<T> extends HTMLAttributes<T> {
         open?: boolean;
     }
@@ -1400,7 +1404,7 @@ declare global {
             code: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLElement>, HTMLElement>;
             col: TyperApp.DetailedHTMLProps<TyperApp.ColHTMLAttributes<HTMLTableColElement>, HTMLTableColElement>;
             colgroup: TyperApp.DetailedHTMLProps<TyperApp.ColgroupHTMLAttributes<HTMLTableColElement>, HTMLTableColElement>;
-            data: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLElement>, HTMLElement>;
+            data: TyperApp.DetailedHTMLProps<TyperApp.DataHTMLAttributes<HTMLDataElement>, HTMLDataElement>;
             datalist: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLDataListElement>, HTMLDataListElement>;
             dd: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLElement>, HTMLElement>;
             del: TyperApp.DetailedHTMLProps<TyperApp.DelHTMLAttributes<HTMLElement>, HTMLElement>;
