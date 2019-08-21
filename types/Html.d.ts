@@ -25,27 +25,6 @@ export = TyperApp;
 export as namespace TyperApp;
 
 declare namespace TyperApp {
-    type Key = string | number;
-
-    interface RefObject<T> {
-        readonly current: T | null;
-    }
-
-    type Ref<T> = { bivarianceHack(instance: T | null): void }["bivarianceHack"] | RefObject<T> | null;
-    type LegacyRef<T> = string | Ref<T>;
-
-    type ComponentState = any;
-
-    interface Attributes {
-        key?: Key;
-    }
-    interface RefAttributes<T> extends Attributes {
-        ref?: Ref<T>;
-    }
-    interface ClassAttributes<T> extends Attributes {
-        ref?: LegacyRef<T>;
-    }
-
     //
     // Event System
     // ----------------------------------------------------------------------
@@ -245,12 +224,12 @@ declare namespace TyperApp {
     //     ref?: LegacyRef<T>;
     // }
 
-    interface HTMLProps<T> extends AllHTMLAttributes<T>, ClassAttributes<T> {
+    interface HTMLProps<T> extends AllHTMLAttributes<T> {
     }
 
-    type DetailedHTMLProps<E extends HTMLAttributes<T>, T> = ClassAttributes<T> & E;
+    type DetailedHTMLProps<E extends HTMLAttributes<T>, T> = E;
 
-    interface SVGProps<T> extends SVGAttributes<T>, ClassAttributes<T> {
+    interface SVGProps<T> extends SVGAttributes<T> {
     }
 
     interface DOMAttributes<T> {
@@ -1544,10 +1523,6 @@ declare global {
     namespace JSX {
         // tslint:disable-next-line:no-empty-interface
         interface Element extends VNode<any> { }
-        // tslint:disable-next-line:no-empty-interface
-        interface IntrinsicAttributes extends TyperApp.Attributes { }
-        // tslint:disable-next-line:no-empty-interface
-        interface IntrinsicClassAttributes<T> extends TyperApp.ClassAttributes<T> { }
 
         interface IntrinsicElements {
             // HTML
