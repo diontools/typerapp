@@ -1,6 +1,6 @@
 // Type definitions for Typerapp
 // forked from https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/react
-// synced: 2019/05/29
+// synced: 2019/07/04
 
 /// <reference path="global.d.ts" />
 
@@ -679,6 +679,7 @@ declare namespace TyperApp {
         href?: string;
         hrefLang?: string;
         media?: string;
+        ping?: string;
         rel?: string;
         target?: string;
         type?: string;
