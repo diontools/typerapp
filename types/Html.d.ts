@@ -1,6 +1,6 @@
 // Type definitions for Typerapp
 // forked from https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/react
-// synced: 2019/08/01
+// synced: 2019/08/08
 
 /// <reference path="global.d.ts" />
 
@@ -1046,6 +1046,7 @@ declare namespace TyperApp {
         headers?: string;
         rowSpan?: number;
         scope?: string;
+        valign?: "top" | "middle" | "bottom" | "baseline";
     }
 
     interface ThHTMLAttributes<T> extends HTMLAttributes<T> {
