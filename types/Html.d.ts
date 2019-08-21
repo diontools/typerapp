@@ -7,6 +7,7 @@
 import * as CSS from 'csstype';
 import { VNode, Class } from 'typerapp'
 
+type NativeEvent = Event;
 type NativeAnimationEvent = AnimationEvent;
 type NativeClipboardEvent = ClipboardEvent;
 type NativeCompositionEvent = CompositionEvent;
@@ -28,23 +29,14 @@ declare namespace TyperApp {
     //
     // Event System
     // ----------------------------------------------------------------------
-    interface BaseSyntheticEvent<E = object, C = unknown, T = unknown> {
-        nativeEvent: E;
-        currentTarget: C;
-        target: T;
-        bubbles: boolean;
-        cancelable: boolean;
-        defaultPrevented: boolean;
-        eventPhase: number;
-        isTrusted: boolean;
-        preventDefault(): void;
-        isDefaultPrevented(): boolean;
-        stopPropagation(): void;
-        isPropagationStopped(): boolean;
-        persist(): void;
-        timeStamp: number;
-        type: string;
-    }
+
+    type BaseEvent<TEvent, TCurrent = unknown, TTarget = unknown, TReplaces = unknown> = {
+        [K in keyof TEvent]:
+        K extends keyof TReplaces ? TReplaces[K] :
+        K extends 'currentTarget' ? TCurrent :
+        K extends 'target' ? TTarget :
+        TEvent[K]
+    } & Pick<TReplaces, Exclude<keyof TReplaces, keyof TEvent>> // add remain props
 
     /**
      * currentTarget - a reference to the element on which the event listener is registered.
@@ -53,136 +45,53 @@ declare namespace TyperApp {
      * This might be a child element to the element on which the event listener is registered.
      * If you thought this should be `EventTarget & T`, see https://github.com/DefinitelyTyped/DefinitelyTyped/pull/12239
      */
-    interface SyntheticEvent<T = Element, E = Event> extends BaseSyntheticEvent<E, EventTarget & T, EventTarget> {}
+    type TypedEvent<TTarget = Element, TEvent = NativeEvent, TReplaces = unknown> = BaseEvent<TEvent, EventTarget & TTarget, EventTarget, TReplaces>
 
-    interface ClipboardEvent<T = Element> extends SyntheticEvent<T, NativeClipboardEvent> {
+    type ClipboardEvent<T = Element> = TypedEvent<T, NativeClipboardEvent, {
         clipboardData: DataTransfer;
-    }
+    }>
 
-    interface CompositionEvent<T = Element> extends SyntheticEvent<T, NativeCompositionEvent> {
-        data: string;
-    }
+    type CompositionEvent<T = Element> = TypedEvent<T, NativeCompositionEvent>
 
-    interface DragEvent<T = Element> extends MouseEvent<T, NativeDragEvent> {
+    type DragEvent<T = Element> = MouseEvent<T, NativeDragEvent, {
         dataTransfer: DataTransfer;
-    }
+    }>
 
-    interface PointerEvent<T = Element> extends MouseEvent<T, NativePointerEvent> {
-        pointerId: number;
-        pressure: number;
-        tiltX: number;
-        tiltY: number;
-        width: number;
-        height: number;
+    type PointerEvent<T = Element> = MouseEvent<T, NativePointerEvent, {
         pointerType: 'mouse' | 'pen' | 'touch';
-        isPrimary: boolean;
-    }
+    }>
 
-    interface FocusEvent<T = Element> extends SyntheticEvent<T, NativeFocusEvent> {
-        relatedTarget: EventTarget;
+    type FocusEvent<T = Element> = TypedEvent<T, NativeFocusEvent, {
         target: EventTarget & T;
-    }
+    }>
 
-    // tslint:disable-next-line:no-empty-interface
-    interface FormEvent<T = Element> extends SyntheticEvent<T> {
-    }
+    type FormEvent<T = Element> = TypedEvent<T>
 
-    interface InvalidEvent<T = Element> extends SyntheticEvent<T> {
+    type ChangeEvent<T = Element> = TypedEvent<T, Event, {
         target: EventTarget & T;
-    }
+    }>
 
-    interface ChangeEvent<T = Element> extends SyntheticEvent<T> {
-        target: EventTarget & T;
-    }
+    type KeyboardEvent<T = Element> = TypedEvent<T, NativeKeyboardEvent>
 
-    interface KeyboardEvent<T = Element> extends SyntheticEvent<T, NativeKeyboardEvent> {
-        altKey: boolean;
-        charCode: number;
-        ctrlKey: boolean;
-        /**
-         * See [DOM Level 3 Events spec](https://www.w3.org/TR/uievents-key/#keys-modifier). for a list of valid (case-sensitive) arguments to this method.
-         */
-        getModifierState(key: string): boolean;
-        /**
-         * See the [DOM Level 3 Events spec](https://www.w3.org/TR/uievents-key/#named-key-attribute-values). for possible values
-         */
-        key: string;
-        keyCode: number;
-        locale: string;
-        location: number;
-        metaKey: boolean;
-        repeat: boolean;
-        shiftKey: boolean;
-        which: number;
-    }
+    type MouseEvent<T = Element, E = NativeMouseEvent, R = unknown> = TypedEvent<T, E, R>
 
-    interface MouseEvent<T = Element, E = NativeMouseEvent> extends SyntheticEvent<T, E> {
-        altKey: boolean;
-        button: number;
-        buttons: number;
-        clientX: number;
-        clientY: number;
-        ctrlKey: boolean;
-        /**
-         * See [DOM Level 3 Events spec](https://www.w3.org/TR/uievents-key/#keys-modifier). for a list of valid (case-sensitive) arguments to this method.
-         */
-        getModifierState(key: string): boolean;
-        metaKey: boolean;
-        movementX: number;
-        movementY: number;
-        pageX: number;
-        pageY: number;
-        relatedTarget: EventTarget;
-        screenX: number;
-        screenY: number;
-        shiftKey: boolean;
-    }
+    type TouchEvent<T = Element> = TypedEvent<T, NativeTouchEvent>
 
-    interface TouchEvent<T = Element> extends SyntheticEvent<T, NativeTouchEvent> {
-        altKey: boolean;
-        changedTouches: TouchList;
-        ctrlKey: boolean;
-        /**
-         * See [DOM Level 3 Events spec](https://www.w3.org/TR/uievents-key/#keys-modifier). for a list of valid (case-sensitive) arguments to this method.
-         */
-        getModifierState(key: string): boolean;
-        metaKey: boolean;
-        shiftKey: boolean;
-        targetTouches: TouchList;
-        touches: TouchList;
-    }
+    type UIEvent<T = Element> = TypedEvent<T, NativeUIEvent>
 
-    interface UIEvent<T = Element> extends SyntheticEvent<T, NativeUIEvent> {
-        detail: number;
-        view: AbstractView;
-    }
+    type WheelEvent<T = Element> = TypedEvent<T, NativeWheelEvent>
 
-    interface WheelEvent<T = Element> extends MouseEvent<T, NativeWheelEvent> {
-        deltaMode: number;
-        deltaX: number;
-        deltaY: number;
-        deltaZ: number;
-    }
+    type AnimationEvent<T = Element> = TypedEvent<T, NativeAnimationEvent>
 
-    interface AnimationEvent<T = Element> extends SyntheticEvent<T, NativeAnimationEvent> {
-        animationName: string;
-        elapsedTime: number;
-        pseudoElement: string;
-    }
-
-    interface TransitionEvent<T = Element> extends SyntheticEvent<T, NativeTransitionEvent> {
-        elapsedTime: number;
-        propertyName: string;
-        pseudoElement: string;
-    }
+    type TransitionEvent<T = Element> = TypedEvent<T, NativeTransitionEvent>
 
     //
     // Event Handler Types
     // ----------------------------------------------------------------------
 
-    type EventHandler<E extends SyntheticEvent<any>> = { bivarianceHack(event: E): void }["bivarianceHack"];
+    type EventHandler<E extends TypedEvent<any>> = { bivarianceHack(event: E): void }["bivarianceHack"];
 
-    type ReactEventHandler<T = Element> = EventHandler<SyntheticEvent<T>>;
+    type TypedEventHandler<T = Element> = EventHandler<TypedEvent<T>>;
 
     type ClipboardEventHandler<T = Element> = EventHandler<ClipboardEvent<T>>;
     type CompositionEventHandler<T = Element> = EventHandler<CompositionEvent<T>>;
@@ -251,10 +160,10 @@ declare namespace TyperApp {
         onInvalidCapture?: FormEventHandler<T>;
 
         // Image Events
-        onLoad?: ReactEventHandler<T>;
-        onLoadCapture?: ReactEventHandler<T>;
-        onError?: ReactEventHandler<T>; // also a Media Event
-        onErrorCapture?: ReactEventHandler<T>; // also a Media Event
+        onLoad?: TypedEventHandler<T>;
+        onLoadCapture?: TypedEventHandler<T>;
+        onError?: TypedEventHandler<T>; // also a Media Event
+        onErrorCapture?: TypedEventHandler<T>; // also a Media Event
 
         // Keyboard Events
         onKeyDown?: KeyboardEventHandler<T>;
@@ -265,50 +174,50 @@ declare namespace TyperApp {
         onKeyUpCapture?: KeyboardEventHandler<T>;
 
         // Media Events
-        onAbort?: ReactEventHandler<T>;
-        onAbortCapture?: ReactEventHandler<T>;
-        onCanPlay?: ReactEventHandler<T>;
-        onCanPlayCapture?: ReactEventHandler<T>;
-        onCanPlayThrough?: ReactEventHandler<T>;
-        onCanPlayThroughCapture?: ReactEventHandler<T>;
-        onDurationChange?: ReactEventHandler<T>;
-        onDurationChangeCapture?: ReactEventHandler<T>;
-        onEmptied?: ReactEventHandler<T>;
-        onEmptiedCapture?: ReactEventHandler<T>;
-        onEncrypted?: ReactEventHandler<T>;
-        onEncryptedCapture?: ReactEventHandler<T>;
-        onEnded?: ReactEventHandler<T>;
-        onEndedCapture?: ReactEventHandler<T>;
-        onLoadedData?: ReactEventHandler<T>;
-        onLoadedDataCapture?: ReactEventHandler<T>;
-        onLoadedMetadata?: ReactEventHandler<T>;
-        onLoadedMetadataCapture?: ReactEventHandler<T>;
-        onLoadStart?: ReactEventHandler<T>;
-        onLoadStartCapture?: ReactEventHandler<T>;
-        onPause?: ReactEventHandler<T>;
-        onPauseCapture?: ReactEventHandler<T>;
-        onPlay?: ReactEventHandler<T>;
-        onPlayCapture?: ReactEventHandler<T>;
-        onPlaying?: ReactEventHandler<T>;
-        onPlayingCapture?: ReactEventHandler<T>;
-        onProgress?: ReactEventHandler<T>;
-        onProgressCapture?: ReactEventHandler<T>;
-        onRateChange?: ReactEventHandler<T>;
-        onRateChangeCapture?: ReactEventHandler<T>;
-        onSeeked?: ReactEventHandler<T>;
-        onSeekedCapture?: ReactEventHandler<T>;
-        onSeeking?: ReactEventHandler<T>;
-        onSeekingCapture?: ReactEventHandler<T>;
-        onStalled?: ReactEventHandler<T>;
-        onStalledCapture?: ReactEventHandler<T>;
-        onSuspend?: ReactEventHandler<T>;
-        onSuspendCapture?: ReactEventHandler<T>;
-        onTimeUpdate?: ReactEventHandler<T>;
-        onTimeUpdateCapture?: ReactEventHandler<T>;
-        onVolumeChange?: ReactEventHandler<T>;
-        onVolumeChangeCapture?: ReactEventHandler<T>;
-        onWaiting?: ReactEventHandler<T>;
-        onWaitingCapture?: ReactEventHandler<T>;
+        onAbort?: TypedEventHandler<T>;
+        onAbortCapture?: TypedEventHandler<T>;
+        onCanPlay?: TypedEventHandler<T>;
+        onCanPlayCapture?: TypedEventHandler<T>;
+        onCanPlayThrough?: TypedEventHandler<T>;
+        onCanPlayThroughCapture?: TypedEventHandler<T>;
+        onDurationChange?: TypedEventHandler<T>;
+        onDurationChangeCapture?: TypedEventHandler<T>;
+        onEmptied?: TypedEventHandler<T>;
+        onEmptiedCapture?: TypedEventHandler<T>;
+        onEncrypted?: TypedEventHandler<T>;
+        onEncryptedCapture?: TypedEventHandler<T>;
+        onEnded?: TypedEventHandler<T>;
+        onEndedCapture?: TypedEventHandler<T>;
+        onLoadedData?: TypedEventHandler<T>;
+        onLoadedDataCapture?: TypedEventHandler<T>;
+        onLoadedMetadata?: TypedEventHandler<T>;
+        onLoadedMetadataCapture?: TypedEventHandler<T>;
+        onLoadStart?: TypedEventHandler<T>;
+        onLoadStartCapture?: TypedEventHandler<T>;
+        onPause?: TypedEventHandler<T>;
+        onPauseCapture?: TypedEventHandler<T>;
+        onPlay?: TypedEventHandler<T>;
+        onPlayCapture?: TypedEventHandler<T>;
+        onPlaying?: TypedEventHandler<T>;
+        onPlayingCapture?: TypedEventHandler<T>;
+        onProgress?: TypedEventHandler<T>;
+        onProgressCapture?: TypedEventHandler<T>;
+        onRateChange?: TypedEventHandler<T>;
+        onRateChangeCapture?: TypedEventHandler<T>;
+        onSeeked?: TypedEventHandler<T>;
+        onSeekedCapture?: TypedEventHandler<T>;
+        onSeeking?: TypedEventHandler<T>;
+        onSeekingCapture?: TypedEventHandler<T>;
+        onStalled?: TypedEventHandler<T>;
+        onStalledCapture?: TypedEventHandler<T>;
+        onSuspend?: TypedEventHandler<T>;
+        onSuspendCapture?: TypedEventHandler<T>;
+        onTimeUpdate?: TypedEventHandler<T>;
+        onTimeUpdateCapture?: TypedEventHandler<T>;
+        onVolumeChange?: TypedEventHandler<T>;
+        onVolumeChangeCapture?: TypedEventHandler<T>;
+        onWaiting?: TypedEventHandler<T>;
+        onWaitingCapture?: TypedEventHandler<T>;
 
         // MouseEvents
         onAuxClick?: MouseEventHandler<T>;
@@ -349,8 +258,8 @@ declare namespace TyperApp {
         onMouseUpCapture?: MouseEventHandler<T>;
 
         // Selection Events
-        onSelect?: ReactEventHandler<T>;
-        onSelectCapture?: ReactEventHandler<T>;
+        onSelect?: TypedEventHandler<T>;
+        onSelectCapture?: TypedEventHandler<T>;
 
         // Touch Events
         onTouchCancel?: TouchEventHandler<T>;
@@ -777,7 +686,7 @@ declare namespace TyperApp {
     }
 
     // tslint:disable-next-line:no-empty-interface
-    interface AudioHTMLAttributes<T> extends MediaHTMLAttributes<T> {}
+    interface AudioHTMLAttributes<T> extends MediaHTMLAttributes<T> { }
 
     interface AreaHTMLAttributes<T> extends HTMLAttributes<T> {
         alt?: string;
@@ -1452,44 +1361,6 @@ declare namespace TyperApp {
         src?: string;
         useragent?: string;
         webpreferences?: string;
-    }
-
-    //
-    // Browser Interfaces
-    // https://github.com/nikeee/2048-typescript/blob/master/2048/js/touch.d.ts
-    // ----------------------------------------------------------------------
-
-    interface AbstractView {
-        styleMedia: StyleMedia;
-        document: Document;
-    }
-
-    interface Touch {
-        identifier: number;
-        target: EventTarget;
-        screenX: number;
-        screenY: number;
-        clientX: number;
-        clientY: number;
-        pageX: number;
-        pageY: number;
-    }
-
-    interface TouchList {
-        [index: number]: Touch;
-        length: number;
-        item(index: number): Touch;
-        identifiedTouch(identifier: number): Touch;
-    }
-
-    //
-    // Error Interfaces
-    // ----------------------------------------------------------------------
-    interface ErrorInfo {
-        /**
-         * Captures which component contained the exception, and its ancestors.
-         */
-        componentStack: string;
     }
 }
 
