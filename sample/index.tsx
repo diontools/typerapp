@@ -25,6 +25,8 @@ const ToggleAuto: Action<State> = state => ({
 
 
 const Input: Action<State, string> = (state, value) => ({ ...state, input: value })
+const AddToList: Action<State, string> = (state, value) => ({ ...state, list: [...state.list, value] })
+const RemoveFromList: Action<State, number> = (state, index) => ({ ...state, list: state.list.filter((v, i) => i !== index) })
 
 const OnTextResponse: Action<State, { text: string }> = (state, payload) => ({
     ...state,
@@ -140,6 +142,16 @@ const router = createRouter<State, RouteProps>({
         title: (state, params) => 'Redirect!',
         path: '/redirect',
         view: (state, dispatch, params) => <Redirect to="/" />,
+    }, {
+        title: (state, params) => 'List',
+        path: '/list',
+        view: (state, dispatch, params) => <div>
+            {state.list.map((text, index) => <div key={index}>{text}<button onClick={ev => dispatch(RemoveFromList, index)}>×</button></div>)}
+            <form onSubmit={ev => { ev.preventDefault(); dispatch(AddToList, state.input)}}>
+                <input value={state.input} onInput={ev => dispatch(Input, ev.currentTarget.value)} />
+                <button type="submit">add</button>
+            </form>
+        </div>
     }],
     matched: (routing, dispatch) => dispatch(SetRoute, routing),
 })
@@ -153,6 +165,7 @@ app<State>({
         part: {
             value: 0,
         },
+        list: [],
         routing: undefined,
     },
     view: (state, dispatch) => (
@@ -169,6 +182,7 @@ app<State>({
                 <li><Link to="/style">Style</Link></li>
                 <li><Link to="/sub">Sub</Link></li>
                 <li><Link to="/redirect">Redirect</Link></li>
+                <li><Link to="/list">List</Link></li>
                 <li><Link to="/unknown">unknown</Link></li>
             </ul>
             {state.routing ? state.routing.route.view(state, dispatch, state.routing.params) : <div>404</div>}
@@ -179,4 +193,8 @@ app<State>({
         state.auto && timer([Add, { amount: 1 }], { interval: 500 }),
     ],
     node: document.body,
+    middleware: dispatch => (action: any, props?: any) => {
+        console.log('dispatch', action, props)
+        dispatch(action, props)
+    },
 })
