@@ -530,7 +530,10 @@ export type Effect<S, P = Empty> = [(dispatch: Dispatch<S>, props: P) => void, P
 export type Subscription<S, P = Empty> = [(dispatch: Dispatch<S>, props: P) => () => void, P]
 
 /** Return type of `subscriptions` function on `app` */
-export type Subscriptions<S> = Subscription<S, any> | boolean | (Subscription<S, any> | boolean)[]
+export type ConditionalSubscription<S> = Subscription<S, any> | boolean
+
+/** Return type of `subscriptions` function on `app` */
+export type Subscriptions<S> = ConditionalSubscription<S> | ConditionalSubscription<S>[]
 
 /** `dispatch` function type */
 export type Dispatch<S> = {
