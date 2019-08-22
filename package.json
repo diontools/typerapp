@@ -1,6 +1,6 @@
 {
   "name": "typerapp",
-  "version": "0.1.0-beta.1",
+  "version": "0.1.0-beta.2",
   "description": "Typerapp is type-safe Hyperapp V2.",
   "main": "lib/main/index.js",
   "types": "main/index.ts",
