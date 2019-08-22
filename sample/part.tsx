@@ -9,9 +9,9 @@ const TextReceived = createAction<{ text: string }>((state, payload) => ({
     value: payload.text.length,
 }))
 
-const RequestText = createAction<string>((state) => [
+const RequestText = createAction<string>((state, url) => [
     state,
-    httpText([TextReceived, res => ({ text: res.text })], '/'),
+    httpText([TextReceived, res => ({ text: res.text })], url),
 ])
 
 export const view: View<State> = ({ part: state }, dispatch) => <div>

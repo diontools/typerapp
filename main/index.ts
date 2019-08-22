@@ -611,16 +611,19 @@ export interface ClassArray extends Array<Class> { }
 /** Class type */
 export type Class = string | number | ClassObject | ClassArray
 
+/** Modularized Action for `actionCreator` */
+export type ModularizedAction<S, N extends keyof S, P = Empty> = (state: S[N], payload: P) => S[N] | [S[N], ...Effect<S, any>[]]
+
 /** Modularization function. [Details](https://github.com/diontools/typerapp#actioncreator) */
 export function actionCreator<S>() {
-    return <N extends keyof S>(name: N): (<P = Empty>(action: Action<S[N], P>) => Action<S, P>) => {
+    return <N extends keyof S>(name: N): (<P = Empty>(action: ModularizedAction<S, N, P>) => Action<S, P>) => {
         return (action) => {
             return (state, payload) => {
                 const r = action(state[name], payload)
                 if (Array.isArray(r)) {
-                    const a: ActionResult<S> = r[0] === state[name] ? [state] : [{ ...state, [name]: r[0] }]
-                    for (let i = 1; i < r.length; i++) a.push(r[i] as Effect<any, any>)
-                    return a
+                    // force replace state
+                    r[0] = r[0] === state[name] ? state : { ...state, [name]: r[0] } as any
+                    return r as any
                 }
                 return r === state[name] ? state : { ...state, [name]: r }
             }
