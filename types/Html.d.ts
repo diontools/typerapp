@@ -5,7 +5,7 @@
 /// <reference path="global.d.ts" />
 
 import * as CSS from 'csstype';
-import { VNode, Class } from 'typerapp'
+import { VNode, Class, Key } from 'typerapp'
 
 type NativeEvent = Event;
 type NativeAnimationEvent = AnimationEvent;
@@ -27,7 +27,7 @@ export as namespace TyperApp;
 
 declare namespace TyperApp {
     interface TyperAppAttribute {
-        key?: string
+        key?: Key
     }
 
     //

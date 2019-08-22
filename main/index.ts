@@ -192,11 +192,11 @@ var patch = function (parent: Node, node: Element | Text, oldVNode: VNode | null
             parent.removeChild(oldVNode.node)
         }
     } else {
-        var tmpVKid
-        var oldVKid
+        var tmpVKid: VNode | null
+        var oldVKid: VNode | null
 
-        var oldKey
-        var newKey
+        var oldKey: Key | null
+        var newKey: Key | null
 
         var oldVProps = oldVNode.props
         var newVProps = newVNode.props
@@ -384,7 +384,7 @@ var getVNode = function (newVNode: VNode, oldVNode?: VNode) {
         : newVNode
 }
 
-var createVNode = function (name: string, props: VNodeProps, children: VNode[], node: Element | undefined, key: string | undefined, type?: number): VNode {
+var createVNode = function (name: string, props: VNodeProps, children: VNode[], node: Element | undefined, key: Key | undefined, type?: number): VNode {
     return {
         name: name,
         props: props,
@@ -583,11 +583,14 @@ export type AppProps<S> = {
     middleware?: (dispatch: Dispatch<S>) => Dispatch<S>,
 }
 
+/** `key` prop type of VNode */
+export type Key = string | number
+
 /** VNode props type */
 export type VNodeProps = { [key: string]: any }
 
 /** Lazy props type */
-export type LazyProp<P> = { key: string, view: (props: P) => VNode } & P
+export type LazyProp<P> = { key: Key, view: (props: P) => VNode } & P
 
 /** Node type of VDOM */
 export interface VNode<Props extends VNodeProps = VNodeProps> {
@@ -595,7 +598,7 @@ export interface VNode<Props extends VNodeProps = VNodeProps> {
     props: Props,
     children: Array<VNode>
     node: Element | Text,
-    key: string | null,
+    key: Key | null,
     type: number,
     lazy?: LazyProp<unknown>,
 }
