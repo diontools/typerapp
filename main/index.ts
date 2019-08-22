@@ -412,7 +412,7 @@ var recycleNode = function (node: Element): VNode {
         )
 }
 
-/** Function to create Lazy VNode */
+/** Create Lazy VNode */
 export var Lazy = function <P>(props: LazyProp<P>): VNode {
     return {
         lazy: props as LazyProp<unknown>,
@@ -420,8 +420,8 @@ export var Lazy = function <P>(props: LazyProp<P>): VNode {
     } as VNode
 }
 
-/** Function to create VNode */
-export var h = function (name: string | Function, props?: {} | null, _children?: any) {
+/** Create VNode */
+export var h = function (name: string | Function, props?: {} | null, _children?: any): VNode {
     for (var vdom: any, rest = [], children = [], i = arguments.length; i-- > 2;) {
         rest.push(arguments[i])
     }
@@ -444,7 +444,7 @@ export var h = function (name: string | Function, props?: {} | null, _children?:
         : createVNode(name, props, children, undefined, (props as any).key)
 }
 
-/** Function to start typerapp application */
+/** Start typerapp application */
 export var app = function <S>(props: AppProps<S>) {
     var state: S = {} as any
     var lock = false
@@ -512,9 +512,9 @@ type VNodeWithKey = { [key: string]: VNode | boolean }
 export type Empty = { ___dummy: never }
 
 /** Return type of Action */
-export type ActionResult<S> = S | [S, ...Effect<any, any>[]]
+export type ActionResult<S> = S | [S, ...Effect<S, any>[]]
 
-/** Action type */
+/** Action: Next state and effects creation. [Details](https://github.com/jorgebucaran/hyperapp/issues/749) */
 export type Action<S, P = Empty> = (state: S, payload: P) => ActionResult<S>
 
 /** Action type for Effect */
@@ -523,16 +523,16 @@ export type EffectAction<S, P, EP = undefined> =
     ? Action<S, Empty> | [Action<S, P>, P]
     : Action<S, Empty> | [Action<S, P>, P] | Action<S, EP> | [Action<S, P>, (effectPayload: EP) => P]
 
-/** Effect object type */
+/** Effect: Side effect declaration. [Details](https://github.com/jorgebucaran/hyperapp/issues/750) */
 export type Effect<S, P = Empty> = [(dispatch: Dispatch<S>, props: P) => void, P]
 
-/** Subscription object type */
+/** Subscription: Event stream subscription. [Details](https://github.com/jorgebucaran/hyperapp/issues/752) */
 export type Subscription<S, P = Empty> = [(dispatch: Dispatch<S>, props: P) => () => void, P]
 
-/** Return type of subscriptions function on app */
+/** Return type of `subscriptions` function on `app` */
 export type Subscriptions<S> = Subscription<S, any> | boolean | (Subscription<S, any> | boolean)[]
 
-/** dispatch function type */
+/** `dispatch` function type */
 export type Dispatch<S> = {
     /** Dispatch Action without payload */
     (action: Action<S, Empty>): void
@@ -562,24 +562,24 @@ export type Dispatch<S> = {
     (init: Action<S> | ActionResult<S>): void
 }
 
-/** Return type of view function on app */
+/** Return type of `view` function on `app` */
 export type View<S> = (state: S, dispatch: Dispatch<S>) => VNode
 
-/** Argument type of app function */
+/** Argument type of `app` function */
 export type AppProps<S> = {
     /** Initial state, Effect or Action */
     init: Action<S> | ActionResult<S>,
 
-    /** VDOM rendering function */
+    /** render VDOM */
     view: View<S>,
 
-    /** Create subscription function */
+    /** Subscribe subscriptions */
     subscriptions?: (state: S) => Subscriptions<S>,
 
     /** Element for rendering target */
     node: Element,
 
-    /** Interrupt dispatch function */
+    /** Interrupt `dispatch` */
     middleware?: (dispatch: Dispatch<S>) => Dispatch<S>,
 }
 
@@ -598,7 +598,6 @@ export interface VNode<Props extends VNodeProps = VNodeProps> {
     key: string | null,
     type: number,
     lazy?: LazyProp<unknown>,
-    render?: () => VNode
 }
 
 /** Class object type */
@@ -612,7 +611,7 @@ export interface ClassArray extends Array<Class> { }
 /** Class type */
 export type Class = string | number | ClassObject | ClassArray
 
-/** Modularization function */
+/** Modularization function. [Details](https://github.com/diontools/typerapp#actioncreator) */
 export function actionCreator<S>() {
     return <N extends keyof S>(name: N): (<P = Empty>(action: Action<S[N], P>) => Action<S, P>) => {
         return (action) => {
