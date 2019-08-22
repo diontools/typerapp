@@ -524,10 +524,10 @@ export type EffectAction<S, P, EP = undefined> =
     : Action<S, Empty> | [Action<S, P>, P] | Action<S, EP> | [Action<S, P>, (effectPayload: EP) => P]
 
 /** Effect: Side effect declaration. [Details](https://github.com/jorgebucaran/hyperapp/issues/750) */
-export type Effect<S, P = Empty> = [(dispatch: Dispatch<S>, props: P) => void, P]
+export type Effect<S, P = undefined> = [(dispatch: Dispatch<S>, props: P) => void, P]
 
 /** Subscription: Event stream subscription. [Details](https://github.com/jorgebucaran/hyperapp/issues/752) */
-export type Subscription<S, P = Empty> = [(dispatch: Dispatch<S>, props: P) => () => void, P]
+export type Subscription<S, P = undefined> = [(dispatch: Dispatch<S>, props: P) => () => void, P]
 
 /** Return type of `subscriptions` function on `app` */
 export type ConditionalSubscription<S> = Subscription<S, any> | boolean
