@@ -26,6 +26,10 @@ export = TyperApp;
 export as namespace TyperApp;
 
 declare namespace TyperApp {
+    interface TyperAppAttribute {
+        key?: string
+    }
+
     //
     // Event System
     // ----------------------------------------------------------------------
@@ -112,12 +116,9 @@ declare namespace TyperApp {
     // Props / DOM Attributes
     // ----------------------------------------------------------------------
 
-    interface HTMLProps<T> extends AllHTMLAttributes<T> {
-    }
+    type DetailedHTMLProps<E extends HTMLAttributes<T>, T> = E & TyperAppAttribute;
 
-    type DetailedHTMLProps<E extends HTMLAttributes<T>, T> = E;
-
-    interface SVGProps<T> extends SVGAttributes<T> {
+    interface SVGProps<T> extends SVGAttributes<T>, TyperAppAttribute {
     }
 
     interface DOMAttributes<T> {
