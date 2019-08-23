@@ -21,27 +21,8 @@ npm install typerapp
 
 ## Modified points from Hyperapp
 
-1. ~~Remove `data` argument from Action~~
-2. Add `dispatch` to `view` arguments
-3. Pure DOM Events
-
-### ~~Remove `data` argument from Action~~
-
-Typerapp Action has only two arguments.
-
-Hyperapp:
-
-```js
-const Act = (state, { value }, data) => ({...})
-```
-
-**Obsoluted: Currently Hyperapp V2 does NOT have a `data` argument.**
-
-Typerapp:
-
-```typescript
-const Act: Action<State, { value: number }> = (state, params) => ({...})
-```
+1. Add `dispatch` to `view` arguments
+1. Pure DOM Events
 
 ### Add `dispatch` to `view` arguments
 
@@ -106,8 +87,8 @@ Type-safe Actions, Effects, Subscriptions, HTML Elements, and more...
 Type:
 
 ```typescript
-export type ActionResult<S> = S | [S, ...Effect<any, any>[]]
-export type Action<S, P = Empty> = (state: S, params: P) => ActionResult<S>
+export type ActionResult<S> = S | [S, ...Effect<S, any>[]]
+export type Action<S, P = Empty> = (state: S, payload: P) => ActionResult<S>
 ```
 
 Use:
@@ -117,20 +98,18 @@ Use:
 const Increment: Action<State> = state => ({ ...state, value: state.value + 1 })
 
 // with parameter
-const Add: Action<State, { amount: number }> = (state, params) => ({
+const Add: Action<State, { amount: number }> = (state, payload) => ({
     ...state,
-    value: state.value + params.amount
+    value: state.value + payload.amount
 })
 ```
 
 ### Effects
 
-**Note: Change signature (move `dispatch` to first argument)**
-
 Type:
 
 ```typescript
-export type Effect<S, P = Empty> = [(dispatch: Dispatch<S>, props: P) => void, P]
+export type Effect<S, P = undefined> = [(dispatch: Dispatch<S>, props: P) => void, P]
 ```
 
 Define Effect:
@@ -171,12 +150,10 @@ const DelayAdd: Action<State, { amount: number }> = (state, params) => [
 
 ### Subscriptions
 
-**Note: Change signature (move `dispatch` to first argument)**
-
 Type:
 
 ```typescript
-export type Subscription<S, P = Empty> = [(dispatch: Dispatch<S>, props: P) => () => void, P]
+export type Subscription<S, P = undefined> = [(dispatch: Dispatch<S>, props: P) => () => void, P]
 ```
 
 Define Subscription:
@@ -228,7 +205,7 @@ const Act: Action<State> = state => ({
 Workaround:
 
 ```typescript
-// type alias for Action/ActionResult
+// type alias for Action/ActionResult (for writing short)
 type MyAction<P = Empty> = Action<State, P>
 type MyResult = ActionResult<State>
 
@@ -272,25 +249,6 @@ export const view: View<State> = ({ part: state }, dispatch) => <div>
 </div>
 ```
 
-### ~~ActionParamOf~~
-
-**Obsoluted: Payload Creator instead**
-
-~~`ActionParamOf` type gets parameter type of Action from Effect/Subscription Constructor.~~
-
-```typescript
-import { ActionParamOf } from 'typerapp'
-import { httpJson } from 'typerapp/fx'
-
-// { json: unknown }
-type ParamType = ActionParamOf<typeof httpJson>
-
-const JsonReceived: Action<State, ParamType> = (state, params) => ({
-    ...state,
-    text: JSON.stringify(params.json)
-})
-```
-
 ### Helmet
 
 `Helmet` renders to the head element of DOM.
@@ -316,7 +274,7 @@ const renderHead = (props: { title: string }) => <Helmet>
 
 app<State>({
     view: (state, dispatch) => <div>
-        <Lazy key="head" render={renderHead} title={state.title} />
+        <Lazy key="head" view={renderHead} title={state.title} />
     </div>
 })
 ```
@@ -430,28 +388,7 @@ import "typerapp/main/svg-alias"
 </svg>
 ```
 
-### ~~mergeAction~~
+## Changelog
 
-**Obsoluted: Payload Creator instead**
-
-~~In Typerapp, if your Effect/Subscription returns a value by Action, you must merge a return value into Action parameter, because Typerapp has not `data` of Action.~~
-
-~~In that case, you can use `mergeAction` function.~~
-
-```typescript
-import { EffectAction, Dispatch, Effect } from "typerapp"
-import { mergeAction } from 'typerapp/fx/utils'
-
-export type RunnerProps<S, P> = {
-    action: EffectAction<S, P, { returnValue: number }>
-}
-
-const effectRunner = <S, P>(props: RunnerProps<S, P>, dispatch: Dispatch<S>) => {
-    dispatch(mergeAction(props.action, { returnValue: 1234 }))
-}
-
-export function effect<S, P>(action: RunnerProps<S, P>["action"]): Effect<S, RunnerProps<S, P>> {
-  return [effectRunner, { action }]
-}
-```
+[See CHANGELOG.md](CHANGELOG.md)
 
