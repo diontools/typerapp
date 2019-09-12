@@ -32,6 +32,7 @@ const view: View<State> = (state, dispatch) => <div>
     <button onClick={ev => dispatch([NormalAction, undefined])}></button>
     <button onClick={ev => dispatch([NormalAction, {}])}></button>
     <button onClick={ev => dispatch([NormalAction, { a: 1 }])}></button>
+    <button onClick={ev => dispatch([NormalAction, p => 1])}></button>
     <button onClick={ev => dispatch([])}></button>
     <button onClick={ev => dispatch([undefined])}></button>
     <button onClick={ev => dispatch([1])}></button>
@@ -52,6 +53,7 @@ const view: View<State> = (state, dispatch) => <div>
     <button onClick={ev => dispatch([ParamAction, undefined])}></button>
     <button onClick={ev => dispatch([ParamAction, {}])}></button>
     <button onClick={ev => dispatch([ParamAction, { a: 1 }])}></button>
+    <button onClick={ev => dispatch([ParamAction, p => ({ value: 1 })])}></button>
 </div>
 
 
@@ -90,8 +92,10 @@ delay(DelayParamedAction, { duration: 1000 })
 
 const HttpAction: Action<State> = state => state
 
-// NG
+// OK
 http(HttpAction, '/')
+
+// NG
 http([HttpAction, {}], '/')
 http(undefined, '/')
 http(null, '/')
@@ -104,15 +108,19 @@ http([HttpAction, 1], '/')
 http([HttpAction, { a: 1 }], '/')
 
 
-const HttpParamedAction: Action<State, { value: number } & ActionParamOf<typeof http>> = (state, params) => ({
+const HttpParamedAction: Action<State, { value: number, response: Response }> = (state, params) => ({
     ...state,
     value: params.value + params.response.status,
 })
 
 // OK
-http([HttpParamedAction, { value: 1 }], '/')
+http([HttpParamedAction, ret => ({ value: 1, response: ret.response })], '/')
+http([HttpParamedAction, { value: 1, response: {} as Response }], '/')
 
 // NG
+http([HttpParamedAction, ret => ({ a: 1, response: ret.response })], '/')
+http([HttpParamedAction, ret => ret], '/')
+http([HttpParamedAction, { value: 1 }], '/')
 http([HttpParamedAction, { value: 'a' }], '/')
 http([HttpParamedAction, { a: 1 }], '/')
 http([HttpParamedAction, {}], '/')
@@ -123,6 +131,20 @@ http([HttpParamedAction], '/')
 http(HttpParamedAction, '/')
 http(null, '/')
 
+
+const HttpResponseAction: Action<State, { response: Response }> = (state, payload) => ({
+    ...state,
+    value: payload.response.status
+})
+
+// OK
+http(HttpResponseAction, '/')
+http([HttpResponseAction, p => p], '/')
+http([HttpResponseAction, { response: {} as Response }], '/')
+
+// NG
+http([HttpResponseAction], '/')
+http([HttpResponseAction, undefined], '/')
 
 
 const partAction = actionCreator<State>()('part')

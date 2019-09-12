@@ -1,4 +1,4 @@
-import { h, app, Action, Lazy, Dispatch, ActionParamOf } from 'typerapp'
+import { h, app, Action, Lazy, Dispatch } from 'typerapp'
 import { Helmet } from 'typerapp/helmet'
 import { style } from 'typerapp/style'
 import { timer, httpText, execute, delay } from 'typerapp/fx';
@@ -6,15 +6,15 @@ import { createRouter, Link, RoutingInfo, Redirect } from 'typerapp/router'
 import { State, RouteProps } from './states'
 import * as part from './part'
 
-const Add: Action<State, { amount: number }> = (state, params) => ({
+const Add: Action<State, { amount: number }> = (state, payload) => ({
     ...state,
-    value: state.value + params.amount,
+    value: state.value + payload.amount,
 })
 
 
-const AddWithDelay: Action<State, { duration: number, amount: number }> = (state, params) => [
+const AddWithDelay: Action<State, { duration: number, amount: number }> = (state, payload) => [
     state,
-    delay([Add, { amount: params.amount }], { duration: params.duration }),
+    delay([Add, { amount: payload.amount }], { duration: payload.duration }),
 ]
 
 
@@ -25,15 +25,17 @@ const ToggleAuto: Action<State> = state => ({
 
 
 const Input: Action<State, string> = (state, value) => ({ ...state, input: value })
+const AddToList: Action<State, string> = (state, value) => ({ ...state, list: [...state.list, value] })
+const RemoveFromList: Action<State, number> = (state, index) => ({ ...state, list: state.list.filter((v, i) => i !== index) })
 
-const OnTextResponse: Action<State, ActionParamOf<typeof httpText>> = (state, params) => ({
+const OnTextResponse: Action<State, { text: string }> = (state, payload) => ({
     ...state,
-    text: params.text
+    text: payload.text
 })
 
 const Act1: Action<State> = state => ({ ...state, value: state.value + 1 })
 const Act2: Action<State> = state => ({ ...state, value: state.value + 2 })
-const Act3: Action<State, { newValue: number }> = (state, params) => ({ ...state, value: params.newValue })
+const Act3: Action<State, { newValue: number }> = (state, payload) => ({ ...state, value: payload.newValue })
 
 execute<State>(dispatch => {
     dispatch(Act1)
@@ -82,7 +84,7 @@ const Counter = (state: State, dispatch: Dispatch<State>, amount: number = 1) =>
     <button onClick={ev => dispatch(ToggleAuto)}>auto:{state.auto ? 'true' : 'false'}</button>
     <div style={{ fontSize: '20px' }}>value: {state.value}</div>
     <div class={'lazy-view'}>
-        <Lazy key='lazy' render={lazyView} auto={state.auto} />
+        <Lazy key='lazy' view={lazyView} auto={state.auto} />
     </div>
 </div>
 
@@ -104,7 +106,7 @@ const router = createRouter<State, RouteProps>({
         path: '/fetch',
         view: (state, dispatch, params) => <div>
             <h2>Fetch</h2>
-            <button onClick={ev => dispatch([state, httpText(OnTextResponse, '/')])}>http requst</button>
+            <button onClick={ev => dispatch([state, httpText([OnTextResponse, p => p], '/')])}>http requst</button>
             <button onClick={ev => dispatch({ ...state, text: '' })}>clear text</button>
             <div>text: {state.text}</div>
         </div>,
@@ -140,6 +142,16 @@ const router = createRouter<State, RouteProps>({
         title: (state, params) => 'Redirect!',
         path: '/redirect',
         view: (state, dispatch, params) => <Redirect to="/" />,
+    }, {
+        title: (state, params) => 'List',
+        path: '/list',
+        view: (state, dispatch, params) => <div>
+            {state.list.map((text, index) => <div key={index}>{text}<button onClick={ev => dispatch(RemoveFromList, index)}>×</button></div>)}
+            <form onSubmit={ev => { ev.preventDefault(); dispatch(AddToList, state.input)}}>
+                <input value={state.input} onInput={ev => dispatch(Input, ev.currentTarget.value)} />
+                <button type="submit">add</button>
+            </form>
+        </div>
     }],
     matched: (routing, dispatch) => dispatch(SetRoute, routing),
 })
@@ -153,11 +165,12 @@ app<State>({
         part: {
             value: 0,
         },
+        list: [],
         routing: undefined,
     },
     view: (state, dispatch) => (
         <div>
-            <Lazy key="head" render={renderHead} title={state.routing ? state.routing.route.title(state, state.routing.params) : '404'} />
+            <Lazy key="head" view={renderHead} title={state.routing ? state.routing.route.title(state, state.routing.params) : '404'} />
 
             <ul>
                 <li><Link to="/">home</Link></li>
@@ -169,6 +182,7 @@ app<State>({
                 <li><Link to="/style">Style</Link></li>
                 <li><Link to="/sub">Sub</Link></li>
                 <li><Link to="/redirect">Redirect</Link></li>
+                <li><Link to="/list">List</Link></li>
                 <li><Link to="/unknown">unknown</Link></li>
             </ul>
             {state.routing ? state.routing.route.view(state, dispatch, state.routing.params) : <div>404</div>}
@@ -178,5 +192,9 @@ app<State>({
         router,
         state.auto && timer([Add, { amount: 1 }], { interval: 500 }),
     ],
-    container: document.body,
+    node: document.body,
+    middleware: dispatch => (action: any, props?: any) => {
+        console.log('dispatch', action, props)
+        dispatch(action, props)
+    },
 })

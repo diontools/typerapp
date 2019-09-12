@@ -8,9 +8,10 @@ export type State = {
     value: number,
     text: string,
     auto: boolean,
-    input: string,
     part: {
         value: number,
     },
+    input: string,
+    list: string[],
     routing?: RoutingInfo<State, RouteProps>,
 }

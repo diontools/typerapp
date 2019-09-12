@@ -4,9 +4,9 @@
 
 Typerapp is type-safe [Hyperapp V2](https://github.com/jorgebucaran/hyperapp) + α. It's written in TypeScript.
 
-Sample: [![Edit typerapp-sample](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/github/diontools/typerapp-sample/tree/master/?fontsize=14&module=%2Fsrc%2Findex.tsx)
+Sample: [![Edit typerapp-sample](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/github/diontools/typerapp-sample/tree/v0.1.0/typerapp-sample/?fontsize=14&module=%2Fsrc%2Findex.tsx)
 
-Minimum sample: [![Edit typerapp-minimum-sample](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/github/diontools/typerapp-minimum-sample/tree/master/?fontsize=14&module=%2Fsrc%2Findex.tsx)
+Minimum sample: [![Edit typerapp-minimum-sample](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/github/diontools/typerapp-sample/tree/v0.1.0/typerapp-minimum-sample/?fontsize=14&module=%2Fsrc%2Findex.tsx)
 
 ## Install
 
@@ -21,25 +21,8 @@ npm install typerapp
 
 ## Modified points from Hyperapp
 
-1. Remove `data` argument from Action
-2. Add `dispatch` to `view` arguments
-3. Pure DOM Events
-
-### Remove `data` argument from Action
-
-Typerapp Action has only two arguments.
-
-Hyperapp:
-
-```js
-const Act = (state, { value }, data) => ({...})
-```
-
-Typerapp:
-
-```typescript
-const Act: Action<State, { value: number }> = (state, params) => ({...})
-```
+1. Add `dispatch` to `view` arguments
+1. Pure DOM Events
 
 ### Add `dispatch` to `view` arguments
 
@@ -104,8 +87,8 @@ Type-safe Actions, Effects, Subscriptions, HTML Elements, and more...
 Type:
 
 ```typescript
-export type ActionResult<S> = S | [S, ...Effect<any, any>[]]
-export type Action<S, P = Empty> = (state: S, params: P) => ActionResult<S>
+export type ActionResult<S> = S | [S, ...Effect<S, any>[]]
+export type Action<S, P = Empty> = (state: S, payload: P) => ActionResult<S>
 ```
 
 Use:
@@ -115,9 +98,9 @@ Use:
 const Increment: Action<State> = state => ({ ...state, value: state.value + 1 })
 
 // with parameter
-const Add: Action<State, { amount: number }> = (state, params) => ({
+const Add: Action<State, { amount: number }> = (state, payload) => ({
     ...state,
-    value: state.value + params.amount
+    value: state.value + payload.amount
 })
 ```
 
@@ -126,7 +109,7 @@ const Add: Action<State, { amount: number }> = (state, params) => ({
 Type:
 
 ```typescript
-export type Effect<S, P = Empty> = [(props: P, dispatch: Dispatch<S>) => void, P]
+export type Effect<S, P = undefined> = [(dispatch: Dispatch<S>, props: P) => void, P]
 ```
 
 Define Effect:
@@ -139,7 +122,7 @@ export type DelayProps<S, P> = {
 }
 
 // Delay Effect Runner
-const DelayRunner = <S, P>(props: DelayProps<S, P>, dispatch: Dispatch<S>) => {
+const DelayRunner = <S, P>(dispatch: Dispatch<S>, props: DelayProps<S, P>) => {
     setTimeout(() => dispatch(props.action), props.duration)
 }
 
@@ -170,7 +153,7 @@ const DelayAdd: Action<State, { amount: number }> = (state, params) => [
 Type:
 
 ```typescript
-export type Subscription<S, P = Empty> = [(props: P, dispatch: Dispatch<S>) => () => void, P]
+export type Subscription<S, P = undefined> = [(dispatch: Dispatch<S>, props: P) => () => void, P]
 ```
 
 Define Subscription:
@@ -183,7 +166,7 @@ export type TimerProps<S, P> = {
 }
 
 // Timer Subscription Runner
-const timerRunner = <S, P>(props: TimerProps<S, P>, dispatch: Dispatch<S>) => {
+const timerRunner = <S, P>(dispatch: Dispatch<S>, props: TimerProps<S, P>) => {
     const id = setInterval(() => dispatch(props.action), props.interval)
     return () => clearInterval(id)
 }
@@ -222,7 +205,7 @@ const Act: Action<State> = state => ({
 Workaround:
 
 ```typescript
-// type alias for Action/ActionResult
+// type alias for Action/ActionResult (for writing short)
 type MyAction<P = Empty> = Action<State, P>
 type MyResult = ActionResult<State>
 
@@ -266,23 +249,6 @@ export const view: View<State> = ({ part: state }, dispatch) => <div>
 </div>
 ```
 
-### ActionParamOf
-
-`ActionParamOf` type gets parameter type of Action from Effect/Subscription Constructor.
-
-```typescript
-import { ActionParamOf } from 'typerapp'
-import { httpJson } from 'typerapp/fx'
-
-// { json: unknown }
-type ParamType = ActionParamOf<typeof httpJson>
-
-const JsonReceived: Action<State, ParamType> = (state, params) => ({
-    ...state,
-    text: JSON.stringify(params.json)
-})
-```
-
 ### Helmet
 
 `Helmet` renders to the head element of DOM.
@@ -308,7 +274,7 @@ const renderHead = (props: { title: string }) => <Helmet>
 
 app<State>({
     view: (state, dispatch) => <div>
-        <Lazy key="head" render={renderHead} title={state.title} />
+        <Lazy key="head" view={renderHead} title={state.title} />
     </div>
 })
 ```
@@ -422,26 +388,7 @@ import "typerapp/main/svg-alias"
 </svg>
 ```
 
-### mergeAction
+## Changelog
 
-In Typerapp, if your Effect/Subscription returns a value by Action, you must merge a return value into Action parameter, because Typerapp has not `data` of Action.
-
-In that case, you can use `mergeAction` function.
-
-```typescript
-import { EffectAction, Dispatch, Effect } from "typerapp"
-import { mergeAction } from 'typerapp/fx/utils'
-
-export type RunnerProps<S, P> = {
-    action: EffectAction<S, P, { returnValue: number }>
-}
-
-const effectRunner = <S, P>(props: RunnerProps<S, P>, dispatch: Dispatch<S>) => {
-    dispatch(mergeAction(props.action, { returnValue: 1234 }))
-}
-
-export function effect<S, P>(action: RunnerProps<S, P>["action"]): Effect<S, RunnerProps<S, P>> {
-  return [effectRunner, { action }]
-}
-```
+[See CHANGELOG.md](CHANGELOG.md)
 

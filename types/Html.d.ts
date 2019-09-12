@@ -1,12 +1,13 @@
 // Type definitions for Typerapp
 // forked from https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/react
-// synced: 2019/04/12
+// synced: 2019/08/08
 
 /// <reference path="global.d.ts" />
 
 import * as CSS from 'csstype';
-import { VNode, Class } from 'typerapp'
+import { VNode, Class, Key } from 'typerapp'
 
+type NativeEvent = Event;
 type NativeAnimationEvent = AnimationEvent;
 type NativeClipboardEvent = ClipboardEvent;
 type NativeCompositionEvent = CompositionEvent;
@@ -21,52 +22,25 @@ type NativeUIEvent = UIEvent;
 type NativeWheelEvent = WheelEvent;
 
 // tslint:disable-next-line:export-just-namespace
-export = TyperApp;
-export as namespace TyperApp;
+export = Typerapp;
+export as namespace Typerapp;
 
-declare namespace TyperApp {
-    type Key = string | number;
-
-    interface RefObject<T> {
-        readonly current: T | null;
-    }
-
-    type Ref<T> = { bivarianceHack(instance: T | null): void }["bivarianceHack"] | RefObject<T> | null;
-    type LegacyRef<T> = string | Ref<T>;
-
-    type ComponentState = any;
-
-    interface Attributes {
-        key?: Key;
-    }
-    interface RefAttributes<T> extends Attributes {
-        ref?: Ref<T>;
-    }
-    interface ClassAttributes<T> extends Attributes {
-        ref?: LegacyRef<T>;
+declare namespace Typerapp {
+    interface TyperAppAttribute {
+        key?: Key
     }
 
     //
     // Event System
     // ----------------------------------------------------------------------
-    // TODO: change any to unknown when moving to TS v3
-    interface BaseSyntheticEvent<E = object, C = any, T = any> {
-        nativeEvent: E;
-        currentTarget: C;
-        target: T;
-        bubbles: boolean;
-        cancelable: boolean;
-        defaultPrevented: boolean;
-        eventPhase: number;
-        isTrusted: boolean;
-        preventDefault(): void;
-        isDefaultPrevented(): boolean;
-        stopPropagation(): void;
-        isPropagationStopped(): boolean;
-        persist(): void;
-        timeStamp: number;
-        type: string;
-    }
+
+    type BaseEvent<TEvent, TCurrent = unknown, TTarget = unknown, TReplaces = unknown> = {
+        [K in keyof TEvent]:
+        K extends keyof TReplaces ? TReplaces[K] :
+        K extends 'currentTarget' ? TCurrent :
+        K extends 'target' ? TTarget :
+        TEvent[K]
+    } & Pick<TReplaces, Exclude<keyof TReplaces, keyof TEvent>> // add remain props
 
     /**
      * currentTarget - a reference to the element on which the event listener is registered.
@@ -75,136 +49,53 @@ declare namespace TyperApp {
      * This might be a child element to the element on which the event listener is registered.
      * If you thought this should be `EventTarget & T`, see https://github.com/DefinitelyTyped/DefinitelyTyped/pull/12239
      */
-    interface SyntheticEvent<T = Element, E = Event> extends BaseSyntheticEvent<E, EventTarget & T, EventTarget> {}
+    type TypedEvent<TTarget = Element, TEvent = NativeEvent, TReplaces = unknown> = BaseEvent<TEvent, EventTarget & TTarget, EventTarget, TReplaces>
 
-    interface ClipboardEvent<T = Element> extends SyntheticEvent<T, NativeClipboardEvent> {
+    type ClipboardEvent<T = Element> = TypedEvent<T, NativeClipboardEvent, {
         clipboardData: DataTransfer;
-    }
+    }>
 
-    interface CompositionEvent<T = Element> extends SyntheticEvent<T, NativeCompositionEvent> {
-        data: string;
-    }
+    type CompositionEvent<T = Element> = TypedEvent<T, NativeCompositionEvent>
 
-    interface DragEvent<T = Element> extends MouseEvent<T, NativeDragEvent> {
+    type DragEvent<T = Element> = MouseEvent<T, NativeDragEvent, {
         dataTransfer: DataTransfer;
-    }
+    }>
 
-    interface PointerEvent<T = Element> extends MouseEvent<T, NativePointerEvent> {
-        pointerId: number;
-        pressure: number;
-        tiltX: number;
-        tiltY: number;
-        width: number;
-        height: number;
+    type PointerEvent<T = Element> = MouseEvent<T, NativePointerEvent, {
         pointerType: 'mouse' | 'pen' | 'touch';
-        isPrimary: boolean;
-    }
+    }>
 
-    interface FocusEvent<T = Element> extends SyntheticEvent<T, NativeFocusEvent> {
-        relatedTarget: EventTarget;
+    type FocusEvent<T = Element> = TypedEvent<T, NativeFocusEvent, {
         target: EventTarget & T;
-    }
+    }>
 
-    // tslint:disable-next-line:no-empty-interface
-    interface FormEvent<T = Element> extends SyntheticEvent<T> {
-    }
+    type FormEvent<T = Element> = TypedEvent<T>
 
-    interface InvalidEvent<T = Element> extends SyntheticEvent<T> {
+    type ChangeEvent<T = Element> = TypedEvent<T, Event, {
         target: EventTarget & T;
-    }
+    }>
 
-    interface ChangeEvent<T = Element> extends SyntheticEvent<T> {
-        target: EventTarget & T;
-    }
+    type KeyboardEvent<T = Element> = TypedEvent<T, NativeKeyboardEvent>
 
-    interface KeyboardEvent<T = Element> extends SyntheticEvent<T, NativeKeyboardEvent> {
-        altKey: boolean;
-        charCode: number;
-        ctrlKey: boolean;
-        /**
-         * See [DOM Level 3 Events spec](https://www.w3.org/TR/uievents-key/#keys-modifier). for a list of valid (case-sensitive) arguments to this method.
-         */
-        getModifierState(key: string): boolean;
-        /**
-         * See the [DOM Level 3 Events spec](https://www.w3.org/TR/uievents-key/#named-key-attribute-values). for possible values
-         */
-        key: string;
-        keyCode: number;
-        locale: string;
-        location: number;
-        metaKey: boolean;
-        repeat: boolean;
-        shiftKey: boolean;
-        which: number;
-    }
+    type MouseEvent<T = Element, E = NativeMouseEvent, R = unknown> = TypedEvent<T, E, R>
 
-    interface MouseEvent<T = Element, E = NativeMouseEvent> extends SyntheticEvent<T, E> {
-        altKey: boolean;
-        button: number;
-        buttons: number;
-        clientX: number;
-        clientY: number;
-        ctrlKey: boolean;
-        /**
-         * See [DOM Level 3 Events spec](https://www.w3.org/TR/uievents-key/#keys-modifier). for a list of valid (case-sensitive) arguments to this method.
-         */
-        getModifierState(key: string): boolean;
-        metaKey: boolean;
-        movementX: number;
-        movementY: number;
-        pageX: number;
-        pageY: number;
-        relatedTarget: EventTarget;
-        screenX: number;
-        screenY: number;
-        shiftKey: boolean;
-    }
+    type TouchEvent<T = Element> = TypedEvent<T, NativeTouchEvent>
 
-    interface TouchEvent<T = Element> extends SyntheticEvent<T, NativeTouchEvent> {
-        altKey: boolean;
-        changedTouches: TouchList;
-        ctrlKey: boolean;
-        /**
-         * See [DOM Level 3 Events spec](https://www.w3.org/TR/uievents-key/#keys-modifier). for a list of valid (case-sensitive) arguments to this method.
-         */
-        getModifierState(key: string): boolean;
-        metaKey: boolean;
-        shiftKey: boolean;
-        targetTouches: TouchList;
-        touches: TouchList;
-    }
+    type UIEvent<T = Element> = TypedEvent<T, NativeUIEvent>
 
-    interface UIEvent<T = Element> extends SyntheticEvent<T, NativeUIEvent> {
-        detail: number;
-        view: AbstractView;
-    }
+    type WheelEvent<T = Element> = TypedEvent<T, NativeWheelEvent>
 
-    interface WheelEvent<T = Element> extends MouseEvent<T, NativeWheelEvent> {
-        deltaMode: number;
-        deltaX: number;
-        deltaY: number;
-        deltaZ: number;
-    }
+    type AnimationEvent<T = Element> = TypedEvent<T, NativeAnimationEvent>
 
-    interface AnimationEvent<T = Element> extends SyntheticEvent<T, NativeAnimationEvent> {
-        animationName: string;
-        elapsedTime: number;
-        pseudoElement: string;
-    }
-
-    interface TransitionEvent<T = Element> extends SyntheticEvent<T, NativeTransitionEvent> {
-        elapsedTime: number;
-        propertyName: string;
-        pseudoElement: string;
-    }
+    type TransitionEvent<T = Element> = TypedEvent<T, NativeTransitionEvent>
 
     //
     // Event Handler Types
     // ----------------------------------------------------------------------
 
-    type EventHandler<E extends SyntheticEvent<any>> = { bivarianceHack(event: E): void }["bivarianceHack"];
+    type EventHandler<E extends TypedEvent<any>> = { bivarianceHack(event: E): void }["bivarianceHack"];
 
-    type ReactEventHandler<T = Element> = EventHandler<SyntheticEvent<T>>;
+    type TypedEventHandler<T = Element> = EventHandler<TypedEvent<T>>;
 
     type ClipboardEventHandler<T = Element> = EventHandler<ClipboardEvent<T>>;
     type CompositionEventHandler<T = Element> = EventHandler<CompositionEvent<T>>;
@@ -225,32 +116,9 @@ declare namespace TyperApp {
     // Props / DOM Attributes
     // ----------------------------------------------------------------------
 
-    /**
-     * @deprecated. This was used to allow clients to pass `ref` and `key`
-     * to `createElement`, which is no longer necessary due to intersection
-     * types. If you need to declare a props object before passing it to
-     * `createElement` or a factory, use `ClassAttributes<T>`:
-     *
-     * ```ts
-     * var b: Button | null;
-     * var props: ButtonProps & ClassAttributes<Button> = {
-     *     ref: b => button = b, // ok!
-     *     label: "I'm a Button"
-     * };
-     * ```
-     */
-    // interface Props<T> {
-    //     children?: ReactNode;
-    //     key?: Key;
-    //     ref?: LegacyRef<T>;
-    // }
+    type DetailedHTMLProps<E extends HTMLAttributes<T>, T> = E & TyperAppAttribute;
 
-    interface HTMLProps<T> extends AllHTMLAttributes<T>, ClassAttributes<T> {
-    }
-
-    type DetailedHTMLProps<E extends HTMLAttributes<T>, T> = ClassAttributes<T> & E;
-
-    interface SVGProps<T> extends SVGAttributes<T>, ClassAttributes<T> {
+    interface SVGProps<T> extends SVGAttributes<T>, TyperAppAttribute {
     }
 
     interface DOMAttributes<T> {
@@ -293,10 +161,10 @@ declare namespace TyperApp {
         onInvalidCapture?: FormEventHandler<T>;
 
         // Image Events
-        onLoad?: ReactEventHandler<T>;
-        onLoadCapture?: ReactEventHandler<T>;
-        onError?: ReactEventHandler<T>; // also a Media Event
-        onErrorCapture?: ReactEventHandler<T>; // also a Media Event
+        onLoad?: TypedEventHandler<T>;
+        onLoadCapture?: TypedEventHandler<T>;
+        onError?: TypedEventHandler<T>; // also a Media Event
+        onErrorCapture?: TypedEventHandler<T>; // also a Media Event
 
         // Keyboard Events
         onKeyDown?: KeyboardEventHandler<T>;
@@ -307,50 +175,50 @@ declare namespace TyperApp {
         onKeyUpCapture?: KeyboardEventHandler<T>;
 
         // Media Events
-        onAbort?: ReactEventHandler<T>;
-        onAbortCapture?: ReactEventHandler<T>;
-        onCanPlay?: ReactEventHandler<T>;
-        onCanPlayCapture?: ReactEventHandler<T>;
-        onCanPlayThrough?: ReactEventHandler<T>;
-        onCanPlayThroughCapture?: ReactEventHandler<T>;
-        onDurationChange?: ReactEventHandler<T>;
-        onDurationChangeCapture?: ReactEventHandler<T>;
-        onEmptied?: ReactEventHandler<T>;
-        onEmptiedCapture?: ReactEventHandler<T>;
-        onEncrypted?: ReactEventHandler<T>;
-        onEncryptedCapture?: ReactEventHandler<T>;
-        onEnded?: ReactEventHandler<T>;
-        onEndedCapture?: ReactEventHandler<T>;
-        onLoadedData?: ReactEventHandler<T>;
-        onLoadedDataCapture?: ReactEventHandler<T>;
-        onLoadedMetadata?: ReactEventHandler<T>;
-        onLoadedMetadataCapture?: ReactEventHandler<T>;
-        onLoadStart?: ReactEventHandler<T>;
-        onLoadStartCapture?: ReactEventHandler<T>;
-        onPause?: ReactEventHandler<T>;
-        onPauseCapture?: ReactEventHandler<T>;
-        onPlay?: ReactEventHandler<T>;
-        onPlayCapture?: ReactEventHandler<T>;
-        onPlaying?: ReactEventHandler<T>;
-        onPlayingCapture?: ReactEventHandler<T>;
-        onProgress?: ReactEventHandler<T>;
-        onProgressCapture?: ReactEventHandler<T>;
-        onRateChange?: ReactEventHandler<T>;
-        onRateChangeCapture?: ReactEventHandler<T>;
-        onSeeked?: ReactEventHandler<T>;
-        onSeekedCapture?: ReactEventHandler<T>;
-        onSeeking?: ReactEventHandler<T>;
-        onSeekingCapture?: ReactEventHandler<T>;
-        onStalled?: ReactEventHandler<T>;
-        onStalledCapture?: ReactEventHandler<T>;
-        onSuspend?: ReactEventHandler<T>;
-        onSuspendCapture?: ReactEventHandler<T>;
-        onTimeUpdate?: ReactEventHandler<T>;
-        onTimeUpdateCapture?: ReactEventHandler<T>;
-        onVolumeChange?: ReactEventHandler<T>;
-        onVolumeChangeCapture?: ReactEventHandler<T>;
-        onWaiting?: ReactEventHandler<T>;
-        onWaitingCapture?: ReactEventHandler<T>;
+        onAbort?: TypedEventHandler<T>;
+        onAbortCapture?: TypedEventHandler<T>;
+        onCanPlay?: TypedEventHandler<T>;
+        onCanPlayCapture?: TypedEventHandler<T>;
+        onCanPlayThrough?: TypedEventHandler<T>;
+        onCanPlayThroughCapture?: TypedEventHandler<T>;
+        onDurationChange?: TypedEventHandler<T>;
+        onDurationChangeCapture?: TypedEventHandler<T>;
+        onEmptied?: TypedEventHandler<T>;
+        onEmptiedCapture?: TypedEventHandler<T>;
+        onEncrypted?: TypedEventHandler<T>;
+        onEncryptedCapture?: TypedEventHandler<T>;
+        onEnded?: TypedEventHandler<T>;
+        onEndedCapture?: TypedEventHandler<T>;
+        onLoadedData?: TypedEventHandler<T>;
+        onLoadedDataCapture?: TypedEventHandler<T>;
+        onLoadedMetadata?: TypedEventHandler<T>;
+        onLoadedMetadataCapture?: TypedEventHandler<T>;
+        onLoadStart?: TypedEventHandler<T>;
+        onLoadStartCapture?: TypedEventHandler<T>;
+        onPause?: TypedEventHandler<T>;
+        onPauseCapture?: TypedEventHandler<T>;
+        onPlay?: TypedEventHandler<T>;
+        onPlayCapture?: TypedEventHandler<T>;
+        onPlaying?: TypedEventHandler<T>;
+        onPlayingCapture?: TypedEventHandler<T>;
+        onProgress?: TypedEventHandler<T>;
+        onProgressCapture?: TypedEventHandler<T>;
+        onRateChange?: TypedEventHandler<T>;
+        onRateChangeCapture?: TypedEventHandler<T>;
+        onSeeked?: TypedEventHandler<T>;
+        onSeekedCapture?: TypedEventHandler<T>;
+        onSeeking?: TypedEventHandler<T>;
+        onSeekingCapture?: TypedEventHandler<T>;
+        onStalled?: TypedEventHandler<T>;
+        onStalledCapture?: TypedEventHandler<T>;
+        onSuspend?: TypedEventHandler<T>;
+        onSuspendCapture?: TypedEventHandler<T>;
+        onTimeUpdate?: TypedEventHandler<T>;
+        onTimeUpdateCapture?: TypedEventHandler<T>;
+        onVolumeChange?: TypedEventHandler<T>;
+        onVolumeChangeCapture?: TypedEventHandler<T>;
+        onWaiting?: TypedEventHandler<T>;
+        onWaitingCapture?: TypedEventHandler<T>;
 
         // MouseEvents
         onAuxClick?: MouseEventHandler<T>;
@@ -391,8 +259,8 @@ declare namespace TyperApp {
         onMouseUpCapture?: MouseEventHandler<T>;
 
         // Selection Events
-        onSelect?: ReactEventHandler<T>;
-        onSelectCapture?: ReactEventHandler<T>;
+        onSelect?: TypedEventHandler<T>;
+        onSelectCapture?: TypedEventHandler<T>;
 
         // Touch Events
         onTouchCancel?: TouchEventHandler<T>;
@@ -812,6 +680,7 @@ declare namespace TyperApp {
         href?: string;
         hrefLang?: string;
         media?: string;
+        ping?: string;
         rel?: string;
         target?: string;
         type?: string;
@@ -819,7 +688,7 @@ declare namespace TyperApp {
     }
 
     // tslint:disable-next-line:no-empty-interface
-    interface AudioHTMLAttributes<T> extends MediaHTMLAttributes<T> {}
+    interface AudioHTMLAttributes<T> extends MediaHTMLAttributes<T> { }
 
     interface AreaHTMLAttributes<T> extends HTMLAttributes<T> {
         alt?: string;
@@ -868,6 +737,10 @@ declare namespace TyperApp {
 
     interface ColgroupHTMLAttributes<T> extends HTMLAttributes<T> {
         span?: number;
+    }
+
+    interface DataHTMLAttributes<T> extends HTMLAttributes<T> {
+        value?: string | string[] | number;
     }
 
     interface DetailsHTMLAttributes<T> extends HTMLAttributes<T> {
@@ -920,6 +793,7 @@ declare namespace TyperApp {
         marginHeight?: number;
         marginWidth?: number;
         name?: string;
+        referrerPolicy?: string;
         sandbox?: string;
         scrolling?: string;
         seamless?: boolean;
@@ -1173,6 +1047,7 @@ declare namespace TyperApp {
         headers?: string;
         rowSpan?: number;
         scope?: string;
+        valign?: "top" | "middle" | "bottom" | "baseline";
     }
 
     interface ThHTMLAttributes<T> extends HTMLAttributes<T> {
@@ -1495,238 +1370,197 @@ declare namespace TyperApp {
         useragent?: string;
         webpreferences?: string;
     }
-
-    //
-    // Browser Interfaces
-    // https://github.com/nikeee/2048-typescript/blob/master/2048/js/touch.d.ts
-    // ----------------------------------------------------------------------
-
-    interface AbstractView {
-        styleMedia: StyleMedia;
-        document: Document;
-    }
-
-    interface Touch {
-        identifier: number;
-        target: EventTarget;
-        screenX: number;
-        screenY: number;
-        clientX: number;
-        clientY: number;
-        pageX: number;
-        pageY: number;
-    }
-
-    interface TouchList {
-        [index: number]: Touch;
-        length: number;
-        item(index: number): Touch;
-        identifiedTouch(identifier: number): Touch;
-    }
-
-    //
-    // Error Interfaces
-    // ----------------------------------------------------------------------
-    interface ErrorInfo {
-        /**
-         * Captures which component contained the exception, and its ancestors.
-         */
-        componentStack: string;
-    }
 }
 
 declare global {
     interface Element {
         readonly style: CSSStyleDeclaration
-        events?: { [key: string]: Function }
+        actions?: { [key: string]: Function }
     }
 
     namespace JSX {
         // tslint:disable-next-line:no-empty-interface
         interface Element extends VNode<any> { }
-        // tslint:disable-next-line:no-empty-interface
-        interface IntrinsicAttributes extends TyperApp.Attributes { }
-        // tslint:disable-next-line:no-empty-interface
-        interface IntrinsicClassAttributes<T> extends TyperApp.ClassAttributes<T> { }
 
         interface IntrinsicElements {
             // HTML
-            a: TyperApp.DetailedHTMLProps<TyperApp.AnchorHTMLAttributes<HTMLAnchorElement>, HTMLAnchorElement>;
-            abbr: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLElement>, HTMLElement>;
-            address: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLElement>, HTMLElement>;
-            area: TyperApp.DetailedHTMLProps<TyperApp.AreaHTMLAttributes<HTMLAreaElement>, HTMLAreaElement>;
-            article: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLElement>, HTMLElement>;
-            aside: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLElement>, HTMLElement>;
-            audio: TyperApp.DetailedHTMLProps<TyperApp.AudioHTMLAttributes<HTMLAudioElement>, HTMLAudioElement>;
-            b: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLElement>, HTMLElement>;
-            base: TyperApp.DetailedHTMLProps<TyperApp.BaseHTMLAttributes<HTMLBaseElement>, HTMLBaseElement>;
-            bdi: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLElement>, HTMLElement>;
-            bdo: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLElement>, HTMLElement>;
-            big: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLElement>, HTMLElement>;
-            blockquote: TyperApp.DetailedHTMLProps<TyperApp.BlockquoteHTMLAttributes<HTMLElement>, HTMLElement>;
-            body: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLBodyElement>, HTMLBodyElement>;
-            br: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLBRElement>, HTMLBRElement>;
-            button: TyperApp.DetailedHTMLProps<TyperApp.ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>;
-            canvas: TyperApp.DetailedHTMLProps<TyperApp.CanvasHTMLAttributes<HTMLCanvasElement>, HTMLCanvasElement>;
-            caption: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLElement>, HTMLElement>;
-            cite: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLElement>, HTMLElement>;
-            code: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLElement>, HTMLElement>;
-            col: TyperApp.DetailedHTMLProps<TyperApp.ColHTMLAttributes<HTMLTableColElement>, HTMLTableColElement>;
-            colgroup: TyperApp.DetailedHTMLProps<TyperApp.ColgroupHTMLAttributes<HTMLTableColElement>, HTMLTableColElement>;
-            data: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLElement>, HTMLElement>;
-            datalist: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLDataListElement>, HTMLDataListElement>;
-            dd: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLElement>, HTMLElement>;
-            del: TyperApp.DetailedHTMLProps<TyperApp.DelHTMLAttributes<HTMLElement>, HTMLElement>;
-            details: TyperApp.DetailedHTMLProps<TyperApp.DetailsHTMLAttributes<HTMLElement>, HTMLElement>;
-            dfn: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLElement>, HTMLElement>;
-            dialog: TyperApp.DetailedHTMLProps<TyperApp.DialogHTMLAttributes<HTMLDialogElement>, HTMLDialogElement>;
-            div: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLDivElement>, HTMLDivElement>;
-            dl: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLDListElement>, HTMLDListElement>;
-            dt: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLElement>, HTMLElement>;
-            em: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLElement>, HTMLElement>;
-            embed: TyperApp.DetailedHTMLProps<TyperApp.EmbedHTMLAttributes<HTMLEmbedElement>, HTMLEmbedElement>;
-            fieldset: TyperApp.DetailedHTMLProps<TyperApp.FieldsetHTMLAttributes<HTMLFieldSetElement>, HTMLFieldSetElement>;
-            figcaption: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLElement>, HTMLElement>;
-            figure: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLElement>, HTMLElement>;
-            footer: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLElement>, HTMLElement>;
-            form: TyperApp.DetailedHTMLProps<TyperApp.FormHTMLAttributes<HTMLFormElement>, HTMLFormElement>;
-            h1: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLHeadingElement>, HTMLHeadingElement>;
-            h2: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLHeadingElement>, HTMLHeadingElement>;
-            h3: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLHeadingElement>, HTMLHeadingElement>;
-            h4: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLHeadingElement>, HTMLHeadingElement>;
-            h5: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLHeadingElement>, HTMLHeadingElement>;
-            h6: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLHeadingElement>, HTMLHeadingElement>;
-            head: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLHeadElement>, HTMLHeadElement>;
-            header: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLElement>, HTMLElement>;
-            hgroup: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLElement>, HTMLElement>;
-            hr: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLHRElement>, HTMLHRElement>;
-            html: TyperApp.DetailedHTMLProps<TyperApp.HtmlHTMLAttributes<HTMLHtmlElement>, HTMLHtmlElement>;
-            i: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLElement>, HTMLElement>;
-            iframe: TyperApp.DetailedHTMLProps<TyperApp.IframeHTMLAttributes<HTMLIFrameElement>, HTMLIFrameElement>;
-            img: TyperApp.DetailedHTMLProps<TyperApp.ImgHTMLAttributes<HTMLImageElement>, HTMLImageElement>;
-            input: TyperApp.DetailedHTMLProps<TyperApp.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
-            ins: TyperApp.DetailedHTMLProps<TyperApp.InsHTMLAttributes<HTMLModElement>, HTMLModElement>;
-            kbd: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLElement>, HTMLElement>;
-            keygen: TyperApp.DetailedHTMLProps<TyperApp.KeygenHTMLAttributes<HTMLElement>, HTMLElement>;
-            label: TyperApp.DetailedHTMLProps<TyperApp.LabelHTMLAttributes<HTMLLabelElement>, HTMLLabelElement>;
-            legend: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLLegendElement>, HTMLLegendElement>;
-            li: TyperApp.DetailedHTMLProps<TyperApp.LiHTMLAttributes<HTMLLIElement>, HTMLLIElement>;
-            link: TyperApp.DetailedHTMLProps<TyperApp.LinkHTMLAttributes<HTMLLinkElement>, HTMLLinkElement>;
-            main: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLElement>, HTMLElement>;
-            map: TyperApp.DetailedHTMLProps<TyperApp.MapHTMLAttributes<HTMLMapElement>, HTMLMapElement>;
-            mark: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLElement>, HTMLElement>;
-            menu: TyperApp.DetailedHTMLProps<TyperApp.MenuHTMLAttributes<HTMLElement>, HTMLElement>;
-            menuitem: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLElement>, HTMLElement>;
-            meta: TyperApp.DetailedHTMLProps<TyperApp.MetaHTMLAttributes<HTMLMetaElement>, HTMLMetaElement>;
-            meter: TyperApp.DetailedHTMLProps<TyperApp.MeterHTMLAttributes<HTMLElement>, HTMLElement>;
-            nav: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLElement>, HTMLElement>;
-            noindex: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLElement>, HTMLElement>;
-            noscript: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLElement>, HTMLElement>;
-            object: TyperApp.DetailedHTMLProps<TyperApp.ObjectHTMLAttributes<HTMLObjectElement>, HTMLObjectElement>;
-            ol: TyperApp.DetailedHTMLProps<TyperApp.OlHTMLAttributes<HTMLOListElement>, HTMLOListElement>;
-            optgroup: TyperApp.DetailedHTMLProps<TyperApp.OptgroupHTMLAttributes<HTMLOptGroupElement>, HTMLOptGroupElement>;
-            option: TyperApp.DetailedHTMLProps<TyperApp.OptionHTMLAttributes<HTMLOptionElement>, HTMLOptionElement>;
-            output: TyperApp.DetailedHTMLProps<TyperApp.OutputHTMLAttributes<HTMLElement>, HTMLElement>;
-            p: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLParagraphElement>, HTMLParagraphElement>;
-            param: TyperApp.DetailedHTMLProps<TyperApp.ParamHTMLAttributes<HTMLParamElement>, HTMLParamElement>;
-            picture: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLElement>, HTMLElement>;
-            pre: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLPreElement>, HTMLPreElement>;
-            progress: TyperApp.DetailedHTMLProps<TyperApp.ProgressHTMLAttributes<HTMLProgressElement>, HTMLProgressElement>;
-            q: TyperApp.DetailedHTMLProps<TyperApp.QuoteHTMLAttributes<HTMLQuoteElement>, HTMLQuoteElement>;
-            rp: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLElement>, HTMLElement>;
-            rt: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLElement>, HTMLElement>;
-            ruby: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLElement>, HTMLElement>;
-            s: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLElement>, HTMLElement>;
-            samp: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLElement>, HTMLElement>;
-            script: TyperApp.DetailedHTMLProps<TyperApp.ScriptHTMLAttributes<HTMLScriptElement>, HTMLScriptElement>;
-            section: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLElement>, HTMLElement>;
-            select: TyperApp.DetailedHTMLProps<TyperApp.SelectHTMLAttributes<HTMLSelectElement>, HTMLSelectElement>;
-            small: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLElement>, HTMLElement>;
-            source: TyperApp.DetailedHTMLProps<TyperApp.SourceHTMLAttributes<HTMLSourceElement>, HTMLSourceElement>;
-            span: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLSpanElement>, HTMLSpanElement>;
-            strong: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLElement>, HTMLElement>;
-            style: TyperApp.DetailedHTMLProps<TyperApp.StyleHTMLAttributes<HTMLStyleElement>, HTMLStyleElement>;
-            sub: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLElement>, HTMLElement>;
-            summary: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLElement>, HTMLElement>;
-            sup: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLElement>, HTMLElement>;
-            table: TyperApp.DetailedHTMLProps<TyperApp.TableHTMLAttributes<HTMLTableElement>, HTMLTableElement>;
-            tbody: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLTableSectionElement>, HTMLTableSectionElement>;
-            td: TyperApp.DetailedHTMLProps<TyperApp.TdHTMLAttributes<HTMLTableDataCellElement>, HTMLTableDataCellElement>;
-            textarea: TyperApp.DetailedHTMLProps<TyperApp.TextareaHTMLAttributes<HTMLTextAreaElement>, HTMLTextAreaElement>;
-            tfoot: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLTableSectionElement>, HTMLTableSectionElement>;
-            th: TyperApp.DetailedHTMLProps<TyperApp.ThHTMLAttributes<HTMLTableHeaderCellElement>, HTMLTableHeaderCellElement>;
-            thead: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLTableSectionElement>, HTMLTableSectionElement>;
-            time: TyperApp.DetailedHTMLProps<TyperApp.TimeHTMLAttributes<HTMLElement>, HTMLElement>;
-            title: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLTitleElement>, HTMLTitleElement>;
-            tr: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLTableRowElement>, HTMLTableRowElement>;
-            track: TyperApp.DetailedHTMLProps<TyperApp.TrackHTMLAttributes<HTMLTrackElement>, HTMLTrackElement>;
-            u: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLElement>, HTMLElement>;
-            ul: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLUListElement>, HTMLUListElement>;
-            "var": TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLElement>, HTMLElement>;
-            video: TyperApp.DetailedHTMLProps<TyperApp.VideoHTMLAttributes<HTMLVideoElement>, HTMLVideoElement>;
-            wbr: TyperApp.DetailedHTMLProps<TyperApp.HTMLAttributes<HTMLElement>, HTMLElement>;
-            webview: TyperApp.DetailedHTMLProps<TyperApp.WebViewHTMLAttributes<HTMLWebViewElement>, HTMLWebViewElement>;
+            a: Typerapp.DetailedHTMLProps<Typerapp.AnchorHTMLAttributes<HTMLAnchorElement>, HTMLAnchorElement>;
+            abbr: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLElement>, HTMLElement>;
+            address: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLElement>, HTMLElement>;
+            area: Typerapp.DetailedHTMLProps<Typerapp.AreaHTMLAttributes<HTMLAreaElement>, HTMLAreaElement>;
+            article: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLElement>, HTMLElement>;
+            aside: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLElement>, HTMLElement>;
+            audio: Typerapp.DetailedHTMLProps<Typerapp.AudioHTMLAttributes<HTMLAudioElement>, HTMLAudioElement>;
+            b: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLElement>, HTMLElement>;
+            base: Typerapp.DetailedHTMLProps<Typerapp.BaseHTMLAttributes<HTMLBaseElement>, HTMLBaseElement>;
+            bdi: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLElement>, HTMLElement>;
+            bdo: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLElement>, HTMLElement>;
+            big: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLElement>, HTMLElement>;
+            blockquote: Typerapp.DetailedHTMLProps<Typerapp.BlockquoteHTMLAttributes<HTMLElement>, HTMLElement>;
+            body: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLBodyElement>, HTMLBodyElement>;
+            br: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLBRElement>, HTMLBRElement>;
+            button: Typerapp.DetailedHTMLProps<Typerapp.ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>;
+            canvas: Typerapp.DetailedHTMLProps<Typerapp.CanvasHTMLAttributes<HTMLCanvasElement>, HTMLCanvasElement>;
+            caption: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLElement>, HTMLElement>;
+            cite: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLElement>, HTMLElement>;
+            code: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLElement>, HTMLElement>;
+            col: Typerapp.DetailedHTMLProps<Typerapp.ColHTMLAttributes<HTMLTableColElement>, HTMLTableColElement>;
+            colgroup: Typerapp.DetailedHTMLProps<Typerapp.ColgroupHTMLAttributes<HTMLTableColElement>, HTMLTableColElement>;
+            data: Typerapp.DetailedHTMLProps<Typerapp.DataHTMLAttributes<HTMLDataElement>, HTMLDataElement>;
+            datalist: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLDataListElement>, HTMLDataListElement>;
+            dd: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLElement>, HTMLElement>;
+            del: Typerapp.DetailedHTMLProps<Typerapp.DelHTMLAttributes<HTMLElement>, HTMLElement>;
+            details: Typerapp.DetailedHTMLProps<Typerapp.DetailsHTMLAttributes<HTMLElement>, HTMLElement>;
+            dfn: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLElement>, HTMLElement>;
+            dialog: Typerapp.DetailedHTMLProps<Typerapp.DialogHTMLAttributes<HTMLDialogElement>, HTMLDialogElement>;
+            div: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLDivElement>, HTMLDivElement>;
+            dl: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLDListElement>, HTMLDListElement>;
+            dt: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLElement>, HTMLElement>;
+            em: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLElement>, HTMLElement>;
+            embed: Typerapp.DetailedHTMLProps<Typerapp.EmbedHTMLAttributes<HTMLEmbedElement>, HTMLEmbedElement>;
+            fieldset: Typerapp.DetailedHTMLProps<Typerapp.FieldsetHTMLAttributes<HTMLFieldSetElement>, HTMLFieldSetElement>;
+            figcaption: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLElement>, HTMLElement>;
+            figure: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLElement>, HTMLElement>;
+            footer: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLElement>, HTMLElement>;
+            form: Typerapp.DetailedHTMLProps<Typerapp.FormHTMLAttributes<HTMLFormElement>, HTMLFormElement>;
+            h1: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLHeadingElement>, HTMLHeadingElement>;
+            h2: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLHeadingElement>, HTMLHeadingElement>;
+            h3: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLHeadingElement>, HTMLHeadingElement>;
+            h4: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLHeadingElement>, HTMLHeadingElement>;
+            h5: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLHeadingElement>, HTMLHeadingElement>;
+            h6: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLHeadingElement>, HTMLHeadingElement>;
+            head: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLHeadElement>, HTMLHeadElement>;
+            header: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLElement>, HTMLElement>;
+            hgroup: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLElement>, HTMLElement>;
+            hr: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLHRElement>, HTMLHRElement>;
+            html: Typerapp.DetailedHTMLProps<Typerapp.HtmlHTMLAttributes<HTMLHtmlElement>, HTMLHtmlElement>;
+            i: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLElement>, HTMLElement>;
+            iframe: Typerapp.DetailedHTMLProps<Typerapp.IframeHTMLAttributes<HTMLIFrameElement>, HTMLIFrameElement>;
+            img: Typerapp.DetailedHTMLProps<Typerapp.ImgHTMLAttributes<HTMLImageElement>, HTMLImageElement>;
+            input: Typerapp.DetailedHTMLProps<Typerapp.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
+            ins: Typerapp.DetailedHTMLProps<Typerapp.InsHTMLAttributes<HTMLModElement>, HTMLModElement>;
+            kbd: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLElement>, HTMLElement>;
+            keygen: Typerapp.DetailedHTMLProps<Typerapp.KeygenHTMLAttributes<HTMLElement>, HTMLElement>;
+            label: Typerapp.DetailedHTMLProps<Typerapp.LabelHTMLAttributes<HTMLLabelElement>, HTMLLabelElement>;
+            legend: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLLegendElement>, HTMLLegendElement>;
+            li: Typerapp.DetailedHTMLProps<Typerapp.LiHTMLAttributes<HTMLLIElement>, HTMLLIElement>;
+            link: Typerapp.DetailedHTMLProps<Typerapp.LinkHTMLAttributes<HTMLLinkElement>, HTMLLinkElement>;
+            main: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLElement>, HTMLElement>;
+            map: Typerapp.DetailedHTMLProps<Typerapp.MapHTMLAttributes<HTMLMapElement>, HTMLMapElement>;
+            mark: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLElement>, HTMLElement>;
+            menu: Typerapp.DetailedHTMLProps<Typerapp.MenuHTMLAttributes<HTMLElement>, HTMLElement>;
+            menuitem: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLElement>, HTMLElement>;
+            meta: Typerapp.DetailedHTMLProps<Typerapp.MetaHTMLAttributes<HTMLMetaElement>, HTMLMetaElement>;
+            meter: Typerapp.DetailedHTMLProps<Typerapp.MeterHTMLAttributes<HTMLElement>, HTMLElement>;
+            nav: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLElement>, HTMLElement>;
+            noindex: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLElement>, HTMLElement>;
+            noscript: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLElement>, HTMLElement>;
+            object: Typerapp.DetailedHTMLProps<Typerapp.ObjectHTMLAttributes<HTMLObjectElement>, HTMLObjectElement>;
+            ol: Typerapp.DetailedHTMLProps<Typerapp.OlHTMLAttributes<HTMLOListElement>, HTMLOListElement>;
+            optgroup: Typerapp.DetailedHTMLProps<Typerapp.OptgroupHTMLAttributes<HTMLOptGroupElement>, HTMLOptGroupElement>;
+            option: Typerapp.DetailedHTMLProps<Typerapp.OptionHTMLAttributes<HTMLOptionElement>, HTMLOptionElement>;
+            output: Typerapp.DetailedHTMLProps<Typerapp.OutputHTMLAttributes<HTMLElement>, HTMLElement>;
+            p: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLParagraphElement>, HTMLParagraphElement>;
+            param: Typerapp.DetailedHTMLProps<Typerapp.ParamHTMLAttributes<HTMLParamElement>, HTMLParamElement>;
+            picture: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLElement>, HTMLElement>;
+            pre: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLPreElement>, HTMLPreElement>;
+            progress: Typerapp.DetailedHTMLProps<Typerapp.ProgressHTMLAttributes<HTMLProgressElement>, HTMLProgressElement>;
+            q: Typerapp.DetailedHTMLProps<Typerapp.QuoteHTMLAttributes<HTMLQuoteElement>, HTMLQuoteElement>;
+            rp: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLElement>, HTMLElement>;
+            rt: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLElement>, HTMLElement>;
+            ruby: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLElement>, HTMLElement>;
+            s: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLElement>, HTMLElement>;
+            samp: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLElement>, HTMLElement>;
+            script: Typerapp.DetailedHTMLProps<Typerapp.ScriptHTMLAttributes<HTMLScriptElement>, HTMLScriptElement>;
+            section: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLElement>, HTMLElement>;
+            select: Typerapp.DetailedHTMLProps<Typerapp.SelectHTMLAttributes<HTMLSelectElement>, HTMLSelectElement>;
+            small: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLElement>, HTMLElement>;
+            source: Typerapp.DetailedHTMLProps<Typerapp.SourceHTMLAttributes<HTMLSourceElement>, HTMLSourceElement>;
+            span: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLSpanElement>, HTMLSpanElement>;
+            strong: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLElement>, HTMLElement>;
+            style: Typerapp.DetailedHTMLProps<Typerapp.StyleHTMLAttributes<HTMLStyleElement>, HTMLStyleElement>;
+            sub: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLElement>, HTMLElement>;
+            summary: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLElement>, HTMLElement>;
+            sup: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLElement>, HTMLElement>;
+            table: Typerapp.DetailedHTMLProps<Typerapp.TableHTMLAttributes<HTMLTableElement>, HTMLTableElement>;
+            template: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLTemplateElement>, HTMLTemplateElement>;
+            tbody: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLTableSectionElement>, HTMLTableSectionElement>;
+            td: Typerapp.DetailedHTMLProps<Typerapp.TdHTMLAttributes<HTMLTableDataCellElement>, HTMLTableDataCellElement>;
+            textarea: Typerapp.DetailedHTMLProps<Typerapp.TextareaHTMLAttributes<HTMLTextAreaElement>, HTMLTextAreaElement>;
+            tfoot: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLTableSectionElement>, HTMLTableSectionElement>;
+            th: Typerapp.DetailedHTMLProps<Typerapp.ThHTMLAttributes<HTMLTableHeaderCellElement>, HTMLTableHeaderCellElement>;
+            thead: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLTableSectionElement>, HTMLTableSectionElement>;
+            time: Typerapp.DetailedHTMLProps<Typerapp.TimeHTMLAttributes<HTMLElement>, HTMLElement>;
+            title: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLTitleElement>, HTMLTitleElement>;
+            tr: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLTableRowElement>, HTMLTableRowElement>;
+            track: Typerapp.DetailedHTMLProps<Typerapp.TrackHTMLAttributes<HTMLTrackElement>, HTMLTrackElement>;
+            u: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLElement>, HTMLElement>;
+            ul: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLUListElement>, HTMLUListElement>;
+            "var": Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLElement>, HTMLElement>;
+            video: Typerapp.DetailedHTMLProps<Typerapp.VideoHTMLAttributes<HTMLVideoElement>, HTMLVideoElement>;
+            wbr: Typerapp.DetailedHTMLProps<Typerapp.HTMLAttributes<HTMLElement>, HTMLElement>;
+            webview: Typerapp.DetailedHTMLProps<Typerapp.WebViewHTMLAttributes<HTMLWebViewElement>, HTMLWebViewElement>;
 
             // SVG
-            svg: TyperApp.SVGProps<SVGSVGElement>;
+            svg: Typerapp.SVGProps<SVGSVGElement>;
 
-            animate: TyperApp.SVGProps<SVGElement>; // TODO: It is SVGAnimateElement but is not in TypeScript's lib.dom.d.ts for now.
-            animateMotion: TyperApp.SVGProps<SVGElement>;
-            animateTransform: TyperApp.SVGProps<SVGElement>; // TODO: It is SVGAnimateTransformElement but is not in TypeScript's lib.dom.d.ts for now.
-            mpath: TyperApp.SVGProps<SVGElement>;
-            circle: TyperApp.SVGProps<SVGCircleElement>;
-            clipPath: TyperApp.SVGProps<SVGClipPathElement>;
-            defs: TyperApp.SVGProps<SVGDefsElement>;
-            desc: TyperApp.SVGProps<SVGDescElement>;
-            ellipse: TyperApp.SVGProps<SVGEllipseElement>;
-            feBlend: TyperApp.SVGProps<SVGFEBlendElement>;
-            feColorMatrix: TyperApp.SVGProps<SVGFEColorMatrixElement>;
-            feComponentTransfer: TyperApp.SVGProps<SVGFEComponentTransferElement>;
-            feComposite: TyperApp.SVGProps<SVGFECompositeElement>;
-            feConvolveMatrix: TyperApp.SVGProps<SVGFEConvolveMatrixElement>;
-            feDiffuseLighting: TyperApp.SVGProps<SVGFEDiffuseLightingElement>;
-            feDisplacementMap: TyperApp.SVGProps<SVGFEDisplacementMapElement>;
-            feDistantLight: TyperApp.SVGProps<SVGFEDistantLightElement>;
-            feDropShadow: TyperApp.SVGProps<SVGFEDropShadowElement>;
-            feFlood: TyperApp.SVGProps<SVGFEFloodElement>;
-            feFuncA: TyperApp.SVGProps<SVGFEFuncAElement>;
-            feFuncB: TyperApp.SVGProps<SVGFEFuncBElement>;
-            feFuncG: TyperApp.SVGProps<SVGFEFuncGElement>;
-            feFuncR: TyperApp.SVGProps<SVGFEFuncRElement>;
-            feGaussianBlur: TyperApp.SVGProps<SVGFEGaussianBlurElement>;
-            feImage: TyperApp.SVGProps<SVGFEImageElement>;
-            feMerge: TyperApp.SVGProps<SVGFEMergeElement>;
-            feMergeNode: TyperApp.SVGProps<SVGFEMergeNodeElement>;
-            feMorphology: TyperApp.SVGProps<SVGFEMorphologyElement>;
-            feOffset: TyperApp.SVGProps<SVGFEOffsetElement>;
-            fePointLight: TyperApp.SVGProps<SVGFEPointLightElement>;
-            feSpecularLighting: TyperApp.SVGProps<SVGFESpecularLightingElement>;
-            feSpotLight: TyperApp.SVGProps<SVGFESpotLightElement>;
-            feTile: TyperApp.SVGProps<SVGFETileElement>;
-            feTurbulence: TyperApp.SVGProps<SVGFETurbulenceElement>;
-            filter: TyperApp.SVGProps<SVGFilterElement>;
-            foreignObject: TyperApp.SVGProps<SVGForeignObjectElement>;
-            g: TyperApp.SVGProps<SVGGElement>;
-            image: TyperApp.SVGProps<SVGImageElement>;
-            line: TyperApp.SVGProps<SVGLineElement>;
-            linearGradient: TyperApp.SVGProps<SVGLinearGradientElement>;
-            marker: TyperApp.SVGProps<SVGMarkerElement>;
-            mask: TyperApp.SVGProps<SVGMaskElement>;
-            metadata: TyperApp.SVGProps<SVGMetadataElement>;
-            path: TyperApp.SVGProps<SVGPathElement>;
-            pattern: TyperApp.SVGProps<SVGPatternElement>;
-            polygon: TyperApp.SVGProps<SVGPolygonElement>;
-            polyline: TyperApp.SVGProps<SVGPolylineElement>;
-            radialGradient: TyperApp.SVGProps<SVGRadialGradientElement>;
-            rect: TyperApp.SVGProps<SVGRectElement>;
-            stop: TyperApp.SVGProps<SVGStopElement>;
-            switch: TyperApp.SVGProps<SVGSwitchElement>;
-            symbol: TyperApp.SVGProps<SVGSymbolElement>;
-            text: TyperApp.SVGProps<SVGTextElement>;
-            textPath: TyperApp.SVGProps<SVGTextPathElement>;
-            tspan: TyperApp.SVGProps<SVGTSpanElement>;
-            use: TyperApp.SVGProps<SVGUseElement>;
-            view: TyperApp.SVGProps<SVGViewElement>;
+            animate: Typerapp.SVGProps<SVGElement>; // TODO: It is SVGAnimateElement but is not in TypeScript's lib.dom.d.ts for now.
+            animateMotion: Typerapp.SVGProps<SVGElement>;
+            animateTransform: Typerapp.SVGProps<SVGElement>; // TODO: It is SVGAnimateTransformElement but is not in TypeScript's lib.dom.d.ts for now.
+            mpath: Typerapp.SVGProps<SVGElement>;
+            circle: Typerapp.SVGProps<SVGCircleElement>;
+            clipPath: Typerapp.SVGProps<SVGClipPathElement>;
+            defs: Typerapp.SVGProps<SVGDefsElement>;
+            desc: Typerapp.SVGProps<SVGDescElement>;
+            ellipse: Typerapp.SVGProps<SVGEllipseElement>;
+            feBlend: Typerapp.SVGProps<SVGFEBlendElement>;
+            feColorMatrix: Typerapp.SVGProps<SVGFEColorMatrixElement>;
+            feComponentTransfer: Typerapp.SVGProps<SVGFEComponentTransferElement>;
+            feComposite: Typerapp.SVGProps<SVGFECompositeElement>;
+            feConvolveMatrix: Typerapp.SVGProps<SVGFEConvolveMatrixElement>;
+            feDiffuseLighting: Typerapp.SVGProps<SVGFEDiffuseLightingElement>;
+            feDisplacementMap: Typerapp.SVGProps<SVGFEDisplacementMapElement>;
+            feDistantLight: Typerapp.SVGProps<SVGFEDistantLightElement>;
+            feDropShadow: Typerapp.SVGProps<SVGFEDropShadowElement>;
+            feFlood: Typerapp.SVGProps<SVGFEFloodElement>;
+            feFuncA: Typerapp.SVGProps<SVGFEFuncAElement>;
+            feFuncB: Typerapp.SVGProps<SVGFEFuncBElement>;
+            feFuncG: Typerapp.SVGProps<SVGFEFuncGElement>;
+            feFuncR: Typerapp.SVGProps<SVGFEFuncRElement>;
+            feGaussianBlur: Typerapp.SVGProps<SVGFEGaussianBlurElement>;
+            feImage: Typerapp.SVGProps<SVGFEImageElement>;
+            feMerge: Typerapp.SVGProps<SVGFEMergeElement>;
+            feMergeNode: Typerapp.SVGProps<SVGFEMergeNodeElement>;
+            feMorphology: Typerapp.SVGProps<SVGFEMorphologyElement>;
+            feOffset: Typerapp.SVGProps<SVGFEOffsetElement>;
+            fePointLight: Typerapp.SVGProps<SVGFEPointLightElement>;
+            feSpecularLighting: Typerapp.SVGProps<SVGFESpecularLightingElement>;
+            feSpotLight: Typerapp.SVGProps<SVGFESpotLightElement>;
+            feTile: Typerapp.SVGProps<SVGFETileElement>;
+            feTurbulence: Typerapp.SVGProps<SVGFETurbulenceElement>;
+            filter: Typerapp.SVGProps<SVGFilterElement>;
+            foreignObject: Typerapp.SVGProps<SVGForeignObjectElement>;
+            g: Typerapp.SVGProps<SVGGElement>;
+            image: Typerapp.SVGProps<SVGImageElement>;
+            line: Typerapp.SVGProps<SVGLineElement>;
+            linearGradient: Typerapp.SVGProps<SVGLinearGradientElement>;
+            marker: Typerapp.SVGProps<SVGMarkerElement>;
+            mask: Typerapp.SVGProps<SVGMaskElement>;
+            metadata: Typerapp.SVGProps<SVGMetadataElement>;
+            path: Typerapp.SVGProps<SVGPathElement>;
+            pattern: Typerapp.SVGProps<SVGPatternElement>;
+            polygon: Typerapp.SVGProps<SVGPolygonElement>;
+            polyline: Typerapp.SVGProps<SVGPolylineElement>;
+            radialGradient: Typerapp.SVGProps<SVGRadialGradientElement>;
+            rect: Typerapp.SVGProps<SVGRectElement>;
+            stop: Typerapp.SVGProps<SVGStopElement>;
+            switch: Typerapp.SVGProps<SVGSwitchElement>;
+            symbol: Typerapp.SVGProps<SVGSymbolElement>;
+            text: Typerapp.SVGProps<SVGTextElement>;
+            textPath: Typerapp.SVGProps<SVGTextPathElement>;
+            tspan: Typerapp.SVGProps<SVGTSpanElement>;
+            use: Typerapp.SVGProps<SVGUseElement>;
+            view: Typerapp.SVGProps<SVGViewElement>;
         }
     }
 }

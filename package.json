@@ -1,6 +1,6 @@
 {
   "name": "typerapp",
-  "version": "0.0.1",
+  "version": "0.1.0-beta.3",
   "description": "Typerapp is type-safe Hyperapp V2.",
   "main": "lib/main/index.js",
   "types": "main/index.ts",
@@ -22,8 +22,7 @@
   },
   "homepage": "https://github.com/diontools/typerapp#readme",
   "dependencies": {
-    "csstype": "^2.6.3",
-    "typescript": "^3.3.4000"
+    "csstype": "^2.6.3"
   },
   "devDependencies": {
     "@types/html-webpack-plugin": "^3.2.0",
@@ -33,6 +32,7 @@
     "ts-loader": "^5.3.3",
     "ts-node": "^8.0.3",
     "tsconfig-paths-webpack-plugin": "^3.2.0",
+    "typescript": "^3.4.5",
     "webpack": "^4.29.6",
     "webpack-cli": "^3.3.0",
     "webpack-dev-server": "^3.2.1"

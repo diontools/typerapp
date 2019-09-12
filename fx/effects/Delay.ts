@@ -5,7 +5,7 @@ export type DelayProps<S, P> = {
     duration: number
 }
 
-const DelayRunner = <S, P>(props: DelayProps<S, P>, dispatch: Dispatch<S>) => {
+const DelayRunner = <S, P>(dispatch: Dispatch<S>, props: DelayProps<S, P>) => {
     setTimeout(() => dispatch(props.action), props.duration)
 }
 
